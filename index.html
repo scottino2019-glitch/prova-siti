@@ -42,6 +42,37 @@ body {
    ========================================================================== */
 /* Stile Base */
 body {
+  margin: 0;
+  padding: 0;
+  background-color: #f7f4ed;
+  background-image: radial-gradient(#292524 1.1px, transparent 1.1px);
+  background-size: 22px 22px;
+  color: #1c1917;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Transizioni fluide */
+* {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+  </style>
+</head>
+<body class="min-h-screen antialiased">
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎨 Creative Multi-Color Studio (Vibrante & Tattile)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+/* ==========================================================================
+   Bento Studio - Custom Styles & Backgrounds
+   ========================================================================== */
+/* Stile Base */
+body {
   background-color: #fbf8f3;
   background-image: 
     linear-gradient(rgba(194, 65, 12, 0.08) 1px, transparent 1px),
@@ -239,7 +270,7 @@ body {
         </div>
       </div>
 
-  <!-- FRAME SMARTPHONE MOBILE 9:16 -->
+  <!-- FRAME Social MOBILE 9:16 -->
 <div class="col-span-1 row-span-3 bg-slate-950 border-4 border-slate-800 rounded-[2.5rem] shadow-2xl p-3 flex flex-col justify-between relative overflow-hidden">
   <iframe 
   src="post/social.html" 
@@ -252,7 +283,7 @@ body {
 </div>
       
 
-      <!-- FRAME SMARTPHONE MOBILE 9:16 -->
+      <!-- FRAME json MOBILE 9:16 -->
 <div class="col-span-2 row-span-3 bg-slate-950 border-4 border-slate-800 rounded-[2.5rem] shadow-2xl p-3 flex flex-col justify-between relative overflow-hidden">
 
 <div class="relative overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] w-full h-[550px] rounded-3xl border-4 border-solid border-indigo-200 shadow-lg">
@@ -265,7 +296,7 @@ body {
   </iframe>
 </div>
 </div>
-      <!-- FRAME SMARTPHONE MOBILE 9:16 -->
+      <!-- FRAME video MOBILE 9:16 -->
 <div class="col-span-2 row-span-3 bg-slate-950 border-4 border-slate-800 rounded-[2.5rem] shadow-2xl p-3 flex flex-col justify-between relative overflow-hidden">
  <div class="relative w-full h-[600px] overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] rounded-3xl border-4 border-solid border-indigo-200 shadow-lg">
   <iframe 
@@ -280,7 +311,7 @@ body {
 
 
 
-      <!-- FRAME SMARTPHONE MOBILE 9:16 -->
+      <!-- FRAME dinamico MOBILE 9:16 -->
 <div class="col-span-1 row-span-3 bg-slate-950 border-4 border-slate-800 rounded-[2.5rem] shadow-2xl p-3 flex flex-col justify-between relative overflow-hidden">
 <div class="relative w-full h-[650px] overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] rounded-3xl border-4 border-solid border-emerald-200 shadow-lg">
   <iframe 
@@ -292,13 +323,60 @@ body {
   </iframe>
 </div>
 </div>
+
+
+
+      <!-- CARD SMERALDO FOREST STATISTICA -->
+<div class="col-span-1 row-span-1 p-5 bg-[#065f46] text-white border-2 border-slate-900 rounded-[2rem] shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
+  <div class="flex items-center justify-between">
+    <span class="text-[10px] font-mono font-black uppercase text-emerald-200 bg-emerald-800/80 px-2 py-0.5 rounded-full">
+      书店
+    </span>
+   <a href="biblioteca.html">  <button class="text-xs font-bold text-emerald-300 bg-emerald-900 px-2 py-0.5 rounded-md">
+      vai ↗
+    </button> </a>
+  </div>
+
+  <div class="my-1">
+    <div class="text-3xl font-black tracking-tight text-white">Biblioteca</div>
+    <p class="text-[11px] text-emerald-100 font-medium mt-0.5">Raccolta di libri cinesi tradotti </p>
+  </div>
+
+  <div class="w-full bg-emerald-800 rounded-full h-1.5 overflow-hidden">
+    <div class="bg-emerald-300 h-full w-[94%] rounded-full"></div>
+  </div>
+</div>
+
+
+      <!-- FRAME POLAROID 1:1 CON WASHI TAPE -->
+<div class="relative col-span-1 row-span-2 p-3.5 bg-white border-2 border-slate-900 rounded-3xl shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between rotate-1 hover:rotate-0 transition-transform">
+  <!-- Washi tape in alto centrato -->
+  <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-300/90 text-amber-950 text-[9px] font-mono font-black px-4 py-0.5 -rotate-2 shadow-xs border-t border-b border-amber-400">
+   Facebook
+  </div>
+
+  <!-- Foto Quadrata -->
+  <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-300 group mt-1">
+    <img 
+      src="img/facebook.png" 
+      alt="facebook" 
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+    />
+    <span class="absolute bottom-2 right-2 px-2 py-0.5 bg-slate-950/80 text-[9px] font-mono text-white rounded-md">
+        35mm · f/1.8
+    </span>
+  </div>
+
+  <!-- Didascalia Polaroid -->
+  <div class="pt-3 pb-1 text-center font-mono">
+    <div class="text-xs font-black text-slate-900">Pagina Social</div>
+    <div class="text-[10px] text-slate-500">Video-Reel-Post-Foto</div>
+  </div>
+</div>
     </div>
 
   </div>
 </div>
-
-</body>
-</html>
 
 </body>
 </html>
