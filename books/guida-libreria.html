@@ -196,6 +196,122 @@ cartella-progetto/
   "htmlPath": "/books/il-mio-libro.html"
 }
     </pre>
+    <pre>
+      {
+  "id": "romanzo-a-puntate",
+  "title": "Il Mio Romanzo",
+  "author": "Nome Autore",
+  "genre": "Avventura",
+  "coverColor": "#1e3a8a",
+  "coverPattern": "vintage-gold",
+  "readingTime": "45 min",
+  "rating": 5.0,
+  "tags": ["Avventura", "Capitoli"],
+  "description": "Una storia divisa in capitoli HTML distinti.",
+  "chapters": [
+    {
+      "id": "cap-1",
+      "number": 1,
+      "title": "La Partenza",
+      "subtitle": "L'inizio del viaggio",
+      "htmlPath": "/books/romanzo-cap1.html",
+      "estimatedMinutes": 15
+    },
+    {
+      "id": "cap-2",
+      "number": 2,
+      "title": "Nel Cuore della Foresta",
+      "subtitle": "L'incontro inaspettato",
+      "htmlPath": "/books/romanzo-cap2.html",
+      "estimatedMinutes": 20
+    },
+    {
+      "id": "cap-3",
+      "number": 3,
+      "title": "L'Epilogo",
+      "subtitle": "La fine dell'avventura",
+      "htmlPath": "/books/romanzo-cap3.html",
+      "estimatedMinutes": 10
+    }
+  ]
+}
+    </pre>
+<pre>
+  {
+  "id": "racconti-brevi",
+  "title": "Racconti Brevi",
+  "author": "Nome Autore",
+  "genre": "Fiabe & Favole",
+  "coverColor": "#065f46",
+  "coverPattern": "botanical",
+  "readingTime": "15 min",
+  "rating": 4.9,
+  "tags": ["Racconti"],
+  "description": "Raccolta di favole e brevi novelle.",
+  "chapters": [
+    {
+      "id": "favola-1",
+      "number": 1,
+      "title": "Il Vecchio Bosco",
+      "subtitle": "Prima novella",
+      "contentHtml": "<p>C'era una volta un antico bosco...</p><p>Gli alberi parlavano al vento.</p>",
+      "estimatedMinutes": 5
+    },
+    {
+      "id": "favola-2",
+      "number": 2,
+      "title": "La Notte delle Stelle",
+      "subtitle": "Seconda novella",
+      "contentHtml": "<p>Quando scese la notte, il cielo si accese di mille luci...</p>",
+      "estimatedMinutes": 8
+    }
+  ]
+}
+</pre>
+    <div>
+      <pre>
+        Nel JSON hai due proprietà per l'estetica della copertina:
+coverColor: il colore di fondo della copertina rigida.
+accentColor: il colore del fregio e delle incisioni (solitamente oro o bronzo, es. "#f7d070").
+coverPattern: il tipo di fregio dorato inciso.
+🎨 Esempi di codici colore pronti all'uso:
+Stile Colore	Codice HEX (coverColor)	Effetto Visivo
+Rubino Antico / Bordeaux	"#7f1d1d"	Rosso scuro classico
+Zaffiro / Notte Profonda	"#1e3a8a"	Blu reale elegante
+Smeraldo Bosco	"#065f46"	Verde bottiglia pregiato
+Cuoio / Caramello Vintage	"#78350f"	Marrone cuoio caldo
+Ossidiana / Carbone	"#1c1917"	Nero texture vintage
+Viola Imperiale	"#3b0764"	Viola scuro regale
+Blu Abisso	"#0f172a"	Ardesia scuro
+✨ Stili di Fregio disponibili (coverPattern):
+Puoi inserire una di queste diciture in "coverPattern":
+"vintage-gold" (cornice classica d'epoca dorata)
+"celestial" (stelle, pianeti e luna)
+"botanical" (motivi floreali e foglie)
+"leather-emboss" (incisione geometrica stile cuoio)
+"steampunk" (ingranaggi e meccaniche vittoriane)
+"cyberpunk" (circuiti moderni)
+"geometric" (linee art déco)
+Esempio nel JSON:
+code
+JSON
+{
+  "coverColor": "#065f46",
+  "accentColor": "#f7d070",
+  "coverPattern": "botanical"
+}
+2. Come funzionano le linee degli scaffali (Scaffali Multipli)
+Gli scaffali non sono solo una linea fissa:
+Il sistema organizza automaticamente i libri a file da 4 per ogni ripiano in legno (o 3/2 a seconda dello schermo di chi guarda).
+Se hai 4 libri: vedrai 1 ripiano in legno con la targhetta dorata "SCAFFALE A • VOL. 1".
+Se inserisci 8 libri: si creeranno automaticamente 2 ripiani sovrapposti (SCAFFALE A e SCAFFALE B).
+Se ne inserisci 12: si creeranno 3 ripiani, e così via all'infinito!
+In più, in alto a destra, i visitatori possono cliccare su:
+Scaffale 3D: la libreria in legno su più piani.
+Griglia: una vista moderna a schede affiancate.
+I Miei Segnalibri: mostra solo i libri che l'utente ha salvato o sta leggendo.
+      </pre>
+    </div>
 
     <h2>🎨 3. Funzionalità integrate nei tuoi file HTML</h2>
     <p>I tuoi file HTML possono contenere stili CSS personalizzati, JavaScript, immagini, animazioni e persino giochi o quiz interattivi!</p>
