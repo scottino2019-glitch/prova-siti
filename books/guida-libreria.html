@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guida alla Tua Biblioteca Digitale</title>
+  <style>
+    :root {
+      --bg: #1c1917;
+      --card-bg: #292524;
+      --text: #f5f5f4;
+      --text-muted: #a8a29e;
+      --accent: #d97706;
+      --accent-light: #f59e0b;
+      --border: #44403c;
+      --code-bg: #0c0a09;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 2rem 1.25rem;
+    }
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      color: var(--accent-light);
+      background: rgba(217, 119, 6, 0.15);
+      border: 1px solid rgba(217, 119, 6, 0.3);
+      border-radius: 9999px;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 2.25rem;
+      font-family: Georgia, serif;
+      font-weight: 700;
+      color: #fafaf9;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 1.1rem;
+    }
+    h2 {
+      font-size: 1.4rem;
+      color: var(--accent-light);
+      margin-top: 2rem;
+      margin-bottom: 0.8rem;
+      font-family: Georgia, serif;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    p {
+      margin-bottom: 1.2rem;
+      color: #e7e5e4;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .card-highlight {
+      border-left: 4px solid var(--accent);
+      background: rgba(217, 119, 6, 0.08);
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      color: #fde68a;
+      margin: 1rem 0;
+    }
+    code {
+      background: rgba(0,0,0,0.4);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #fcd34d;
+      font-size: 0.9em;
+    }
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1.2rem;
+    }
+    li {
+      margin-bottom: 0.5rem;
+    }
+    .interactive-demo {
+      background: #1e1b4b;
+      border: 1px solid #4338ca;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+    }
+    button.demo-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      font-weight: bold;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    button.demo-btn:hover {
+      background: var(--accent-light);
+    }
+    .demo-output {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      display: none;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Guida Ufficiale</div>
+      <h1>Come Configurare la Tua Biblioteca</h1>
+      <p class="subtitle">Istruzioni per inserire i file HTML nella cartella e renderli visibili a tutti i visitatori del sito</p>
+    </header>
+
+    <div class="card card-highlight">
+      <strong>✨ Struttura Condivisa per Tutti:</strong> I file inseriti nella cartella <code>public/books/</code> dell'applicazione sono disponibili via web per chiunque apra questa homepage!
+    </div>
+
+    <h2>📁 1. Dove posizionare i file HTML</h2>
+    <p>All'interno della cartella principale del progetto, trovi la cartella dedicata <code>public/books/</code>:</p>
+    
+    <pre>
+cartella-progetto/
+├── public/
+│   └── books/
+│       ├── catalog.json                  &larr; Indice di tutti i libri del sito
+│       ├── guida-libreria.html
+│       ├── il-piccolo-principe.html
+│       ├── il-mio-libro-1.html           &larr; Inserisci qui i tuoi file .html
+│       └── un-altro-libro.html
+└── src/
+    </pre>
+
+    <h2>⚙️ 2. Come registrare un nuovo libro</h2>
+    <p>Puoi registrare un nuovo libro in due modi semplicissimi:</p>
+    <ol>
+      <li><strong>Dal pannello dell'app:</strong> Clicca sul pulsante in alto <code>"📂 Gestisci File & Catalogo"</code> oppure <code>"Aggiungi Libro HTML"</code>, inserisci il nome del file (es. <code>/books/il-mio-libro.html</code>), titolo, autore e copertina.</li>
+      <li><strong>Modificando direttamente <code>public/books/catalog.json</code>:</strong> Aggiungi una voce come questa:</li>
+    </ol>
+
+    <pre>
+{
+  "id": "il-mio-libro",
+  "title": "Il Titolo del Tuo Libro",
+  "author": "Nome Autore",
+  "originalYear": 2026,
+  "genre": "Avventura",
+  "coverColor": "#1e3a8a",
+  "coverPattern": "vintage-gold",
+  "pagesCount": 120,
+  "readingTime": "30 min",
+  "rating": 5.0,
+  "tags": ["Romanzo", "Nuovo"],
+  "description": "Una breve sinossi visibile nella scheda del libro.",
+  "htmlPath": "/books/il-mio-libro.html"
+}
+    </pre>
+
+    <h2>🎨 3. Funzionalità integrate nei tuoi file HTML</h2>
+    <p>I tuoi file HTML possono contenere stili CSS personalizzati, JavaScript, immagini, animazioni e persino giochi o quiz interattivi!</p>
+
+    <div class="interactive-demo">
+      <h3 style="color: #a5b4fc; margin-bottom: 0.5rem;">🧪 Esempio di Elemento Interattivo HTML</h3>
+      <p style="font-size: 0.9rem; margin-bottom: 1rem;">I visitatori possono interagire direttamente con la pagina:</p>
+      <button class="demo-btn" onclick="document.getElementById('demo-result').style.display = 'block'">
+        Fai clic per testare l'interazione
+      </button>
+      <div id="demo-result" class="demo-output">
+        🎉 <strong>Fantastico!</strong> Questo script JavaScript viene eseguito all'interno del lettore della biblioteca senza bloccare la navigazione.
+      </div>
+    </div>
+
+    <h2>🗑️ 4. Eliminare o Sostituire i Libri di Prova</h2>
+    <p>Nella barra in alto della homepage puoi cliccare su <strong>"Gestisci File & Catalogo"</strong> per eliminare con un clic tutti i libri che non ti servono, lasciando solo i tuoi volumi preferiti.</p>
+  </div>
+</body>
+</html>

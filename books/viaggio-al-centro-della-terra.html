@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viaggio al Centro della Terra</title>
+  <style>
+    :root {
+      --bg: #064e3b;
+      --card-bg: #022c22;
+      --text: #ecfdf5;
+      --accent: #34d399;
+      --gold: #fbbf24;
+      --font-serif: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #022c22 radial-gradient(circle at 50% 10%, #064e3b 0%, #022c22 100%);
+      color: var(--text);
+      font-family: var(--font-serif);
+      line-height: 1.8;
+      padding: 3rem 1.5rem;
+      font-size: 1.15rem;
+    }
+    .wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(52, 211, 153, 0.2);
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+    .author {
+      font-style: italic;
+      color: #6ee7b7;
+      font-size: 1.1rem;
+    }
+    h2 {
+      font-size: 1.6rem;
+      color: var(--accent);
+      margin-top: 3rem;
+      margin-bottom: 1.2rem;
+    }
+    p {
+      margin-bottom: 1.4rem;
+      text-align: justify;
+    }
+    .cipher-box {
+      font-family: monospace;
+      background: #000;
+      border: 1px dashed var(--accent);
+      padding: 1.2rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      color: #a7f3d0;
+      font-size: 0.95rem;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+    .quote-box {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: rgba(52, 211, 153, 0.1);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: #d1fae5;
+    }
+    .depth-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background: rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      margin: 2rem 0;
+      font-family: -apple-system, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <div style="font-size: 2rem; margin-bottom: 0.5rem;">🧭 🌋 ⛏️</div>
+      <h1>Viaggio al Centro della Terra</h1>
+      <div class="author">di Jules Verne (1864)</div>
+    </div>
+
+    <div class="depth-indicator">
+      <span>📍 Posizione attuale: <strong>Vulcano Sneffels, Islanda</strong></span>
+      <span style="color: var(--gold);">Profondità: <strong>-1.250 m</strong></span>
+    </div>
+
+    <h2>Capitolo I — La Pergamena Runica</h2>
+    <p>Il 24 maggio 1863, una domenica, mio zio, il professor Otto Lidenbrock, rientrò precipitosamente nella sua casetta situata al numero 19 della Königstrasse, una delle più antiche vie del quartiere di Amburgo.</p>
+
+    <p>Mio zio era un uomo celebre nel mondo accademico, professore di mineralogia al Johannaeum. Tra le mani stringeva un tesoro inestimabile: un vecchio manoscritto in caratteri runici islandesi scritto dal celebre alchimista Arne Saknussemm.</p>
+
+    <div class="cipher-box">
+      In Sneffels Yoculis craterem kem delibat<br>
+      umbra Scartaris Julii intra calendas descende,<br>
+      audas viator, et terrestre centrum attinges.
+    </div>
+
+    <div class="quote-box">
+      «Discendi nel cratere dello Sneffels Yocul che l'ombra dello Scartaris viene a carezzare prima delle calende di luglio, o viaggiatore audace, e tu perverrai al centro della terra!»
+    </div>
+
+    <h2>Capitolo II — La Discesa negli Abissi</h2>
+    <p>Il viaggio fu deciso in un istante. Con la fedele guida islandese Hans Bjelke, silenzioso e impassibile come le rocce della sua terra, raggiungemmo l'orlo del cratere spento. Tre camini si aprivano nella gola oscura: l'ombra dello Scartaris indicò la via esatta.</p>
+
+    <p>Ci legammo con robuste funi di canapa e iniziammo la vertiginosa discesa nell'oscurità più profonda, dove l'aria diveniva densa e tiepida, e la luce della superficie svanì per sempre sopra le nostre teste.</p>
+  </div>
+</body>
+</html>

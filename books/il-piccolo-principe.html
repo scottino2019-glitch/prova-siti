@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Piccolo Principe</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --accent: #f59e0b;
+      --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-serif);
+      line-height: 1.8;
+      padding: 3rem 1.5rem;
+      font-size: 1.15rem;
+    }
+    .wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .star-icon {
+      font-size: 2.5rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #fef08a;
+      margin-bottom: 0.5rem;
+    }
+    .author {
+      font-style: italic;
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+    h2 {
+      font-size: 1.6rem;
+      color: var(--accent);
+      margin-top: 3rem;
+      margin-bottom: 1.2rem;
+    }
+    p {
+      margin-bottom: 1.4rem;
+      text-align: justify;
+    }
+    .lead {
+      font-size: 1.25rem;
+      color: #fed7aa;
+    }
+    .quote-box {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: rgba(245, 158, 11, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: #fef3c7;
+    }
+    .interactive-card {
+      background: var(--card-bg);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2.5rem 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .interactive-btn {
+      background: #f59e0b;
+      color: #0f172a;
+      border: none;
+      font-weight: 700;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-top: 0.8rem;
+    }
+    .interactive-btn:hover {
+      background: #fbbf24;
+    }
+    .hidden-content {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      display: none;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <div class="star-icon">✨ 🪐 🌹</div>
+      <h1>Il Piccolo Principe</h1>
+      <div class="author">di Antoine de Saint-Exupéry</div>
+    </div>
+
+    <h2>Capitolo I — Il Disegno del Boa</h2>
+    <p class="lead">Un tempo lontano, quando avevo sei anni, vidi un magnifico disegno in un libro sulle foreste primordiali intitolato <em>«Storie vissute della natura»</em>. Rappresentava un serpente boa nell'atto di inghiottire una fiera.</p>
+    
+    <p>Il libro diceva: <em>«I serpenti boa ingoiano la loro preda tutta intera, senza masticarla. Dopodiché non possono più muoversi e dormono durante i sei mesi che la digestione richiede.»</em></p>
+
+    <div class="interactive-card">
+      <h3 style="color: #f59e0b; margin-bottom: 0.5rem;">🔍 Curiosità sul disegno n° 1</h3>
+      <p style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 0.5rem;">I grandi vedevano tutti un semplice cappello. Vuoi scoprire il segreto del disegno?</p>
+      <button class="interactive-btn" onclick="document.getElementById('secret-boa').style.display = 'block'">
+        Svela il segreto del Boa
+      </button>
+      <div id="secret-boa" class="hidden-content">
+        🐘 <strong>«Ho allora disegnato l'interno del serpente boa affinché i grandi potessero capire. Hanno sempre bisogno di spiegazioni.»</strong>
+      </div>
+    </div>
+
+    <h2>Capitolo II — L'Incontro nel Sahara</h2>
+    <p>Così ho vissuto solo, senza nessuno con cui poter parlare veramente, fino a un guasto nel deserto del Sahara, sei anni fa. Qualcosa si era rotto nel mio motore. E siccome non avevo con me né un meccanico né dei passeggeri, mi accinsi a tentare di riuscire, tutto da solo, in una difficile riparazione. Per me era una questione di vita o di morte: avevo a malapena acqua da bere per otto giorni.</p>
+
+    <p>La prima sera mi addormentai dunque sulla sabbia a mille miglia da qualsiasi terra abitata. Ero molto più isolato di un naufrago su una zattera in mezzo all'oceano.</p>
+
+    <div class="quote-box">
+      «Per favore... mi disegni una pecora?»
+    </div>
+
+    <p>Balzai in piedi come se fossi stato colpito da un fulmine. Mi strofinai gli occhi con forza e guardai attentamente. Vidi un ometto straordinario che mi esaminava con gravità.</p>
+
+    <h2>Capitolo III — L'Addomesticamento</h2>
+    <p>Fu allora che apparve la volpe. <em>«Buon giorno»</em>, disse la volpe. <em>«Buon giorno»</em>, rispose gentilmente il piccolo principe voltandosi, ma non vide nulla. — <em>«Sono qui sotto il melo»</em>, disse la voce.</p>
+
+    <div class="quote-box">
+      «Non si vede bene che col cuore. L'essenziale è invisibile agli occhi.»
+    </div>
+
+    <p><em>«È il tempo che hai perduto per la tua rosa che ha reso la tua rosa così importante»</em>, aggiunse la volpe. <em>«Tu diventi responsabile per sempre di quello che hai addomesticato. Tu sei responsabile della tua rosa...»</em></p>
+  </div>
+</body>
+</html>
