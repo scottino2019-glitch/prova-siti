@@ -98,5 +98,30 @@
       "bookmarkedChapters": [],
       "progressPercentage": 0
     }
+  },
+  {
+    "id": "Cappuccetto Rosso",
+    "title": "Cappuccetto Rosso",
+    "author": "Grimm",
+    "originalYear": 2026,
+    "genre": "Fiabe",
+   "coverColor": "#78350f",
+    "coverPattern": "vintage-gold",
+    "accentColor": "#f7d070",
+    "pagesCount": 5,
+    "readingTime": "10 min",
+    "rating": 5.0,
+    "tags": ["Fiabe", "Grimm", "Interattivo"],
+    "description": "Un esempio di file HTML che puoi modificare o sostituire con i tuoi testi e racconti direttamente nella cartella dell'app.",
+    "htmlPath": "/books/cappuccetto_rosso.html",
+    "isFolderFile": true,
+    "isRawHtmlOnly": true,
+    "chapters": [],
+    "progress": {
+      "currentChapterIndex": 0,
+      "completed": false,
+      "bookmarkedChapters": [],
+      "progressPercentage": 0
+    }
   }
 ]
