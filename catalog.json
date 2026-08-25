@@ -1,0 +1,102 @@
+[
+  {
+    "id": "guida-libreria",
+    "title": "Guida alla Tua Biblioteca",
+    "author": "Amministrazione Sito",
+    "originalYear": 2026,
+    "genre": "Filosofia",
+    "coverColor": "#78350f",
+    "coverPattern": "vintage-gold",
+    "accentColor": "#f7d070",
+    "pagesCount": 12,
+    "readingTime": "5 min",
+    "rating": 5.0,
+    "tags": ["Guida", "Tutorial", "HTML", "Configurazione"],
+    "description": "Istruzioni chiare su come inserire i tuoi file HTML nella cartella public/books/ e personalizzare la homepage per tutti gli utenti del sito.",
+    "htmlPath": "/books/guida-libreria.html",
+    "isFolderFile": true,
+    "isRawHtmlOnly": true,
+    "chapters": [],
+    "progress": {
+      "currentChapterIndex": 0,
+      "completed": false,
+      "bookmarkedChapters": [],
+      "progressPercentage": 0
+    }
+  },
+  {
+    "id": "piccolo-principe",
+    "title": "Il Piccolo Principe",
+    "author": "Antoine de Saint-Exupéry",
+    "originalYear": 1943,
+    "genre": "Fiabe & Favole",
+    "coverColor": "#1e293b",
+    "coverPattern": "celestial",
+    "accentColor": "#f7d070",
+    "pagesCount": 96,
+    "readingTime": "25 min",
+    "rating": 4.9,
+    "tags": ["Classico", "Illustrato", "Filosofia", "Poesia"],
+    "description": "Il viaggio poetico di un principe venuto da un lontano asteroide che impara i segreti dell'amicizia e dell'invisibile agli occhi.",
+    "htmlPath": "/books/il-piccolo-principe.html",
+    "isFolderFile": true,
+    "isRawHtmlOnly": true,
+    "chapters": [],
+    "progress": {
+      "currentChapterIndex": 0,
+      "completed": false,
+      "bookmarkedChapters": [],
+      "progressPercentage": 0
+    }
+  },
+  {
+    "id": "viaggio-centro-terra",
+    "title": "Viaggio al Centro della Terra",
+    "author": "Jules Verne",
+    "originalYear": 1864,
+    "genre": "Avventura",
+    "coverColor": "#065f46",
+    "coverPattern": "steampunk",
+    "accentColor": "#34d399",
+    "pagesCount": 240,
+    "readingTime": "45 min",
+    "rating": 4.8,
+    "tags": ["Avventura", "Scienza", "Mistero", "Esplorazione"],
+    "description": "La straordinaria spedizione del professor Lidenbrock attraverso i cunicoli del vulcano islandese Sneffels fino alle viscere del pianeta.",
+    "htmlPath": "/books/viaggio-al-centro-della-terra.html",
+    "isFolderFile": true,
+    "isRawHtmlOnly": true,
+    "chapters": [],
+    "progress": {
+      "currentChapterIndex": 0,
+      "completed": false,
+      "bookmarkedChapters": [],
+      "progressPercentage": 0
+    }
+  },
+  {
+    "id": "il-mio-primo-libro",
+    "title": "Il Mio Libro Personalizzato",
+    "author": "Il Tuo Nome",
+    "originalYear": 2026,
+    "genre": "I Miei Libri",
+    "coverColor": "#7f1d1d",
+    "coverPattern": "botanical",
+    "accentColor": "#f59e0b",
+    "pagesCount": 30,
+    "readingTime": "10 min",
+    "rating": 5.0,
+    "tags": ["Bozza", "Personale", "Interattivo"],
+    "description": "Un esempio di file HTML che puoi modificare o sostituire con i tuoi testi e racconti direttamente nella cartella dell'app.",
+    "htmlPath": "/books/il-mio-primo-libro.html",
+    "isFolderFile": true,
+    "isRawHtmlOnly": true,
+    "chapters": [],
+    "progress": {
+      "currentChapterIndex": 0,
+      "completed": false,
+      "bookmarkedChapters": [],
+      "progressPercentage": 0
+    }
+  }
+]
