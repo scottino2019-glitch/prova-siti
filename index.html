@@ -15,6 +15,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Catalogo opzionale caricabile direttamente offline -->
+  <script src="books/catalog.js"></script>
 
   <script>
     tailwind.config = {
@@ -379,8 +381,39 @@
         description: "Un esempio di file HTML che puoi modificare o sostituire con i tuoi testi e racconti direttamente nella cartella dell'app.",
         htmlPath: "books/il-mio-primo-libro.html",
         chapters: []
+      },
+      {
+        id: "cappuccetto-rosso",
+        title: "Cappuccetto Rosso",
+        author: "Fratelli Grimm",
+        originalYear: 2026,
+        genre: "Fiabe & Favole",
+        coverColor: "#881337",
+        coverPattern: "botanical",
+        accentColor: "#fecdd3",
+        pagesCount: 5,
+        readingTime: "10 min",
+        rating: 5.0,
+        tags: ["Fiabe", "Grimm", "Classico", "Audio"],
+        description: "La celebre fiaba della bambina dal mantello rosso, del lupo nel bosco e della casa della nonna.",
+        htmlPath: "books/cappuccetto_rosso.html",
+        chapters: []
       }
     ];
+
+    // Funzione helper per sanificare percorsi e oggetti libro
+    function normalizeBookList(list) {
+      if (!Array.isArray(list)) return [];
+      return list.map(b => {
+        let cleanPath = b.htmlPath || '';
+        if (cleanPath.startsWith('/')) cleanPath = cleanPath.slice(1);
+        return {
+          ...b,
+          id: b.id || b.title.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+          htmlPath: cleanPath
+        };
+      });
+    }
 
     // Stato Applicazione
     let allBooks = [];
@@ -400,31 +433,38 @@
       lucide.createIcons();
     });
 
-    // Carica il catalogo (cerca prima books/catalog.json o public/books/catalog.json, con fallback sui default)
+    // Carica il catalogo (da catalog.json o catalog.js con fallback)
     async function loadBooksCatalog() {
-      const candidates = ['./books/catalog.json', 'books/catalog.json', './public/books/catalog.json', 'public/books/catalog.json'];
       let loaded = false;
 
+      // 1. Prova a caricare via fetch (server HTTP / GitHub Pages / Netlify / Vercel)
+      const candidates = ['./books/catalog.json', 'books/catalog.json', '/books/catalog.json'];
       for (const path of candidates) {
         try {
           const res = await fetch(path);
           if (res.ok) {
             const data = await res.json();
             if (Array.isArray(data) && data.length > 0) {
-              allBooks = data;
+              allBooks = normalizeBookList(data);
               loaded = true;
-              console.log('Catalogo caricato da:', path);
+              console.log('Catalogo caricato via fetch da:', path);
               break;
             }
           }
         } catch (e) {
-          // fetch locale o percorso diverso
+          // Ignora errori di fetch (es. CORS su file://)
         }
       }
 
+      // 2. Se fetch non è disponibile (es. doppio clic su file:/// index.html), usa catalog.js o i default
       if (!loaded) {
-        allBooks = [...DEFAULT_BOOKS];
-        console.log('Catalogo inizializzato con dati di default');
+        if (window.BOOKS_CATALOG && Array.isArray(window.BOOKS_CATALOG) && window.BOOKS_CATALOG.length > 0) {
+          allBooks = normalizeBookList(window.BOOKS_CATALOG);
+          console.log('Catalogo caricato da books/catalog.js');
+        } else {
+          allBooks = normalizeBookList(DEFAULT_BOOKS);
+          console.log('Catalogo inizializzato con dati di default');
+        }
       }
     }
 
@@ -674,7 +714,7 @@
     // GESTIONE LETTORE
     // =========================================================================
     function openReader(bookId) {
-      const book = allBooks.find(b => b.id === bookId);
+      const book = allBooks.find(b => String(b.id) === String(bookId));
       if (!book) return;
 
       currentReadingBook = book;
