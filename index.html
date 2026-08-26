@@ -9,7 +9,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Gloria+Hallelujah&family=Outfit:wght@300;400;500;600;700&family=Rock+Salt&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS & Lucide Icons via CDN (Nessun server o npm build richiesto) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -25,8 +25,8 @@
         extend: {
           fontFamily: {
             serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-            cinzel: ['Cinzel', 'serif'],
-            lora: ['Lora', 'serif'],
+            rocksalt: ['"Rock Salt"', 'cursive'],
+            gloria: ['"Gloria Hallelujah"', 'cursive'],
             sans: ['Outfit', 'sans-serif']
           }
         }
@@ -42,9 +42,9 @@
       font-family: 'Outfit', sans-serif;
     }
 
-    .font-cinzel { font-family: 'Cinzel', serif; }
+    .font-rocksalt { font-family: 'Rock Salt', cursive; }
+    .font-gloria { font-family: 'Gloria Hallelujah', cursive; }
     .font-garamond { font-family: 'Cormorant Garamond', Georgia, serif; }
-    .font-lora { font-family: 'Lora', serif; }
 
     /* Stile Scaffale in Legno */
     .wood-shelf {
@@ -125,10 +125,10 @@
             <i data-lucide="book-open" class="w-5 h-5"></i>
           </div>
           <div>
-            <h1 class="font-cinzel text-lg sm:text-xl font-bold tracking-wider text-amber-100 flex items-center gap-2">
+            <h1 class="font-rocksalt text-lg sm:text-xl font-bold tracking-wider text-amber-100 flex items-center gap-2">
               BIBLIOTECA DIGITALE
             </h1>
-            <p class="text-[11px] text-amber-400/70 tracking-widest uppercase font-mono">Archivio Opere & Libri HTML</p>
+       
           </div>
         </div>
 
@@ -214,7 +214,7 @@
       <div class="w-16 h-16 rounded-full bg-stone-800 flex items-center justify-center mx-auto mb-4 text-stone-500">
         <i data-lucide="book-x" class="w-8 h-8"></i>
       </div>
-      <h3 class="font-cinzel text-lg text-amber-200 mb-1">Nessun libro trovato</h3>
+      <h3 class="font-rocksalt text-lg text-amber-200 mb-1">Nessun libro trovato</h3>
       <p class="text-xs text-stone-400 max-w-sm mx-auto mb-5">Nessuna opera corrisponde ai filtri di ricerca selezionati.</p>
       <button onclick="resetFilters()" class="px-4 py-2 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 rounded-xl text-xs border border-amber-500/30 transition">
         Mostra tutti i libri
@@ -246,7 +246,7 @@
           <i data-lucide="arrow-left" class="w-5 h-5"></i>
         </button>
         <div class="truncate">
-          <h2 id="readerBookTitle" class="font-cinzel text-sm sm:text-base font-bold truncate text-amber-200">Titolo Libro</h2>
+          <h2 id="readerBookTitle" class="font-gloria text-sm sm:text-base font-bold truncate text-amber-200">Titolo Libro</h2>
           <p id="readerBookAuthor" class="text-[11px] text-stone-400 truncate">Autore</p>
         </div>
       </div>
@@ -587,7 +587,7 @@
               <!-- Il Ripiano in Legno massiccio -->
               <div class="wood-shelf h-7 w-full rounded-md mt-4 relative flex items-center justify-center">
                 <!-- Targa in Ottone Incisa -->
-                <div class="brass-plate px-4 py-0.5 rounded text-[10px] font-cinzel font-black tracking-widest uppercase border border-amber-800/40">
+                <div class="brass-plate px-4 py-0.5 rounded text-[10px] font-rocksalt font-black tracking-widest uppercase border border-amber-800/40">
                   SCAFFALE ${letter} • VOL. ${shelfNumber}
                 </div>
               </div>
@@ -626,7 +626,7 @@
 
             <!-- Centro Titolo -->
             <div class="relative z-10 text-center pl-2 my-auto">
-              <h4 class="font-cinzel text-sm sm:text-base font-bold leading-snug line-clamp-3 text-amber-100 drop-shadow-md">
+              <h4 class="font-gloria text-sm sm:text-base font-bold leading-snug line-clamp-3 text-amber-100 drop-shadow-md">
                 ${book.title}
               </h4>
               <p class="font-garamond italic text-xs mt-1 opacity-90 line-clamp-1" style="color: ${accentCol};">
@@ -670,12 +670,12 @@
             <div class="flex items-start gap-4">
               <div class="w-20 aspect-[2/3] rounded-r-md rounded-l-xs shrink-0 shadow-md p-2 flex flex-col justify-between" style="background-color: ${book.coverColor || '#1e293b'};">
                 <span class="text-[8px] uppercase tracking-wider text-amber-300 font-mono">${book.originalYear || '2026'}</span>
-                <p class="font-cinzel text-[10px] font-bold text-amber-100 leading-tight line-clamp-2">${book.title}</p>
+                <p class="font-gloria text-[10px] font-bold text-amber-100 leading-tight line-clamp-2">${book.title}</p>
                 <span class="text-[8px] text-amber-400 font-mono">★ ${book.rating || '5.0'}</span>
               </div>
               <div class="flex-1 min-w-0">
                 <span class="text-[10px] font-mono uppercase tracking-wider text-amber-500">${book.genre || 'Generale'}</span>
-                <h4 class="font-cinzel text-base font-bold text-amber-100 truncate group-hover:text-amber-300 transition">${book.title}</h4>
+                <h4 class="font-gloria text-base font-bold text-amber-100 truncate group-hover:text-amber-300 transition">${book.title}</h4>
                 <p class="text-xs text-stone-400 mb-2">${book.author}</p>
                 <p class="text-xs text-stone-500 line-clamp-2 leading-relaxed">${book.description || 'Nessuna descrizione disponibile.'}</p>
               </div>
@@ -817,7 +817,7 @@
         iframe.classList.add('hidden');
         textContainer.classList.remove('hidden');
         document.getElementById('readerTextContent').innerHTML = `
-          <h2 class="font-cinzel text-2xl sm:text-3xl font-bold mb-2">${chapter.title}</h2>
+          <h2 class="font-gloria text-2xl sm:text-3xl font-bold mb-2">${chapter.title}</h2>
           ${chapter.subtitle ? `<p class="italic text-stone-600 mb-6">${chapter.subtitle}</p>` : ''}
           <div class="mt-4">${chapter.contentHtml || '<p>Contenuto non disponibile.</p>'}</div>
         `;
