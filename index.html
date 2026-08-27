@@ -1,960 +1,2345 @@
-<!DOCTYPE html>
-<html lang="it" class="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Biblioteca Digitale Interattiva</title>
-  <meta name="description" content="Homepage in stile biblioteca in legno con libri interattivi e lettore incorporato a schermo intero." />
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Gloria+Hallelujah&family=Outfit:wght@300;400;500;600;700&family=Rock+Salt&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS & Lucide Icons via CDN (Nessun server o npm build richiesto) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <!-- Catalogo opzionale caricabile direttamente offline -->
-  <script src="books/catalog.js"></script>
 
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stereo</title>
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    /* ==========================================================================
+       Bento Studio - Custom Styles & Warm Rice Paper Background
+       ========================================================================== */
+    :root {
+      --bg-balanced: #dce3eb;
+      --grid-line: rgba(15, 23, 42, 0.07);
+    }
+
+    body {
+      overflow-x: hidden;
+      background-color: #dce3eb;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.09) 0%, transparent 60%),
+        radial-gradient(circle at 10% 40%, rgba(6, 182, 212, 0.07) 0%, transparent 40%),
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+      color: #0f172a;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Neo Brutalism Shadows */
+    .neo-shadow {
+      box-shadow: 4px 4px 0px 0px rgba(15, 23, 42, 1);
+    }
+    .neo-shadow-sm {
+      box-shadow: 2px 2px 0px 0px rgba(15, 23, 42, 1);
+    }
+    .neo-shadow-lg {
+      box-shadow: 6px 6px 0px 0px rgba(15, 23, 42, 1);
+    }
+    .neo-shadow-amber {
+      box-shadow: 4px 4px 0px 0px #d97706;
+    }
+
+    /* Transizioni fluide */
+    * {
+      transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+      box-sizing: border-box;
+    }
+
+    /* Ideogramma Filigrana Sfondo (Tonalità ambra/oro calda elegante) */
+    .watermark-ideogram {
+      color: #b45309;
+      opacity: 0.04;
+      text-shadow: 0 0 60px rgba(180, 83, 9, 0.08);
+    }
+    /* Transizioni fluide */
+    * {
+      transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+      box-sizing: border-box;
+    }
+
+    /* Ideogramma Filigrana Calda (Meno bianco, tono pergamena raffinata) */
+    .watermark-ideogram {
+      color: #78350f;
+      opacity: 0.055;
+      text-shadow: 0 10px 40px rgba(120, 53, 15, 0.15);
+    }
+
+    /* Modal Iframe */
+    #modalIframe {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(13, 19, 31, 0.75);
+      backdrop-filter: blur(6px);
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    #modalIframe.active { display: flex; }
+    #modalContent {
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 20px;
+      width: 95vw; max-width: 900px;
+      height: 85vh;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+    }
+    #modalContent iframe {
+      width: 100%; height: 100%;
+      border: none;
+    }
+    #modalCloseBtn {
+      position: absolute;
+      top: 10px; right: 14px;
+      width: 36px; height: 36px;
+      font-size: 1.4rem; font-weight: bold;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 20;
+      transition: all 0.2s;
+    }
+    #modalCloseBtn:hover {
+      background: #ef4444;
+      transform: scale(1.1);
+    }
+
+    /* --- Campanella Animata --- */
+    @keyframes animate-swing {
+      0% { transform: rotate(0deg); transform-origin: top center; }
+      20% { transform: rotate(15deg); transform-origin: top center; }
+      40% { transform: rotate(-10deg); transform-origin: top center; }
+      60% { transform: rotate(5deg); transform-origin: top center; }
+      80% { transform: rotate(-5deg); transform-origin: top center; }
+      100% { transform: rotate(0deg); transform-origin: top center; }
+    }
+    .bell-container { position: fixed; top: 18px; right: 20px; z-index: 9999; }
+    .animated-element {
+      display: inline-block; font-size: 1.8rem;
+      padding: 6px; line-height: 1; cursor: pointer;
+      animation: animate-swing 2.8s ease-out infinite;
+      will-change: transform; transition: transform 0.2s;
+    }
+    .animated-element:hover { transform: scale(1.15) !important; }
+    .badge {
+      position: absolute; top: -2px; right: -2px; background: #ef4444; color: white;
+      border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold;
+      line-height: 18px; text-align: center; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
+      border: 2px solid #0d131f;
+    }
+    @media (max-width: 768px) { 
+      .bell-container { top: 12px; right: 12px; } 
+      .animated-element { font-size: 1.4rem; padding: 4px; } 
+    }
+
+    /* --- Sticker Rotazioni & Pin --- */
+    .sticker-rotate-left { transform: rotate(-1.5deg); }
+    .sticker-rotate-right { transform: rotate(1.8deg); }
+    .sticker-rotate-slight { transform: rotate(-0.8deg); }
+
+    .sticker-rotate-left:hover, 
+    .sticker-rotate-right:hover, 
+    .sticker-rotate-slight:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    .pin-sticker::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff, #d63b3b 55%, #8d1111 100%);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      z-index: 10;
+    }
+
+    /* --- 3D INTERACTIVE FLASHCARD FLIP --- */
+    .flashcard-3d-wrap {
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .flashcard-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    .flashcard-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+    .flashcard-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 1.25rem;
+      top: 0;
+      left: 0;
+    }
+    .flashcard-back {
+      transform: rotateY(180deg);
+    }
+
+    /* --- DEVICE SMARTPHONE --- */
+    .smartphone-card {
+      position: relative;
+      width: 100%;
+      max-width: 310px;
+      min-height: 290px;
+      background-color: #1e1b4b;
+      border: 2px solid #312e81;
+      border-radius: 24px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 16px 35px -5px rgba(15, 23, 42, 0.6);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    .smartphone-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: #06b6d4;
+      box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2), 0 15px 30px rgba(0, 0, 0, 0.5);
+    }
+    .phone-rim {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .phone-bezel {
+      position: relative;
+      width: 230px;
+      max-width: 100%;
+      height: 260px;
+      background: #0284c7;
+      border: 4px solid #0f172a;
+      border-radius: 20px;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .phone-earpiece {
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 34px;
+      height: 3px;
+      background: #334155;
+      border-radius: 2px;
+      z-index: 10;
+    }
+    .phone-camera {
+      position: absolute;
+      top: 5px;
+      left: calc(50% + 24px);
+      width: 5px;
+      height: 5px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 50%;
+      z-index: 10;
+    }
+    .phone-screen {
+      position: relative;
+      flex-grow: 1;
+      background: #b91c1c;
+      margin: 3px;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .phone-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 10px;
+      font-family: monospace;
+      font-size: 8px;
+      color: #fff;
+      z-index: 6;
+      background: rgba(0,0,0,0.3);
+    }
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .phone-wifi {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #22c55e;
+    }
+    .phone-battery {
+      width: 10px;
+      height: 5px;
+      border: 1px solid #fff;
+      border-radius: 1px;
+      position: relative;
+    }
+    .phone-battery::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 75%;
+      background: #22c55e;
+    }
+    .charging-wave-ocean {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 0px;
+      background: rgba(6, 182, 212, 0.2);
+      overflow: hidden;
+      transition: height 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .smartphone-card:hover .charging-wave-ocean {
+      height: 60px;
+    }
+    .liquid-wave {
+      position: absolute;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      border-radius: 38%;
+      background-color: rgba(6, 182, 212, 0.35);
+      bottom: 12px;
+    }
+    .wave-back { animation: waveScroll 5s linear infinite; }
+    .wave-front {
+      background-color: rgba(6, 182, 212, 0.55);
+      bottom: 6px;
+      animation: waveScroll 3s linear infinite reverse;
+    }
+    .charging-text {
+      position: relative;
+      z-index: 20;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .smartphone-card:hover .charging-text { opacity: 1; }
+    .phone-home-indicator {
+      width: 45px;
+      height: 2.5px;
+      background: #fff;
+      margin: 4px auto;
+      border-radius: 1px;
+      z-index: 6;
+    }
+
+    @keyframes waveScroll {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Roji Widget Flottante */
+    #roji-container {
+  width: 80px; 
+  height: 80px;
+  /* L'espansione partirà dall'angolo in basso a destra */
+  transform-origin: bottom right; 
+}
+
+/* Espansione quando passi il mouse (PC) o fai tap (Mobile) */
+#roji-container:hover, 
+#roji-container:focus-within {
+  width: 450px !important;  /* Più largo per accogliere bene la chat */
+  height: 750px !important; /* Più alto */
+  
+  /* Regole fondamentali per non uscire dallo schermo sugli smartphone */
+  max-width: calc(100vw - 40px) !important; 
+  max-height: calc(100vh - 40px) !important;
+}
+    /* Frame Moderni & Mockups */
+    .frame-wrapper {
+      position: relative;
+      border-radius: 2rem;
+      background: #090d16;
+      border: 3px solid #1e293b;
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .frame-wrapper:hover {
+      border-color: #3b82f6;
+    }
+    .frame-header-bar {
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Categorie Filter Card Animations */
+    .bento-card {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .bento-card.card-hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-            rocksalt: ['"Rock Salt"', 'cursive'],
-            gloria: ['"Gloria Hallelujah"', 'cursive'],
-            sans: ['Outfit', 'sans-serif']
+            'titolo': ['"Playfair Display"', 'serif'],
+            'calligrafico': ['"Ma Shan Zheng"', 'cursive'],
+            'hanzi': ['"Noto Serif SC"', '"Ma Shan Zheng"', 'serif'],
+            'handwriting': ['"Shadows Into Light"', 'cursive'],
+            'sans': ['"Plus Jakarta Sans"', '"Zen Kaku Gothic New"', 'sans-serif'],
+            'mono': ['"Space Mono"', 'monospace'],
+          },
+          colors: {
+            'china-red': '#D32F2F',
+            'china-gold': '#FFD700',
+            'cyber-neon': '#00E5FF',
+            'cyber-pink': '#FF007F',
+            'cyber-dark': '#0d131f',
+            'rice-paper': '#f3ede2',
+            'warm-ink': '#231f1c',
           }
         }
       }
     }
   </script>
 
-  <style>
-    /* Texture & 3D Wood Effects */
-    body {
-      background-color: #0f0e0c;
-      color: #ede8d0;
-      font-family: 'Outfit', sans-serif;
-    }
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@500;700;900&family=Playfair+Display:ital,wght@0,700;1,400&family=Shadows+Into+Light&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
-    .font-rocksalt { font-family: 'Rock Salt', cursive; }
-    .font-gloria { font-family: 'Gloria Hallelujah', cursive; }
-    .font-garamond { font-family: 'Cormorant Garamond', Georgia, serif; }
+<body class="min-h-screen text-slate-900 font-sans relative overflow-x-hidden pb-16 w-full select-none-safe">
 
-    /* Stile Scaffale in Legno */
-    .wood-shelf {
-      background: linear-gradient(180deg, #45220d 0%, #2b1406 40%, #170902 100%);
-      box-shadow: inset 0 2px 4px rgba(255,215,0,0.15), 0 12px 24px rgba(0,0,0,0.8), 0 4px 8px rgba(0,0,0,0.6);
-      border-top: 2px solid #6b3512;
-      border-bottom: 4px solid #140701;
-    }
+  <!-- Ideogramma Gigante Filigrana di Sfondo -->
+  <div class="fixed inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <span class="watermark-ideogram text-[18rem] sm:text-[30rem] md:text-[46rem] font-calligrafico leading-none transform -rotate-12 select-none">
+      中文
+    </span>
+  </div>
 
-    .shelf-backdrop {
-      background: radial-gradient(circle at 50% 30%, #2a1b12 0%, #150d09 70%, #0a0604 100%);
-      box-shadow: inset 0 0 80px rgba(0,0,0,0.9);
-    }
-
-    .brass-plate {
-      background: linear-gradient(135deg, #d4af37 0%, #aa820a 50%, #d4af37 100%);
-      color: #1a1005;
-      text-shadow: 0 1px 1px rgba(255,255,255,0.4);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.6);
-    }
-
-    /* 3D Book perspective */
-    .book-card {
-      perspective: 1000px;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .book-card:hover {
-      transform: translateY(-10px);
-    }
-
-    .book-cover {
-      box-shadow: -6px 8px 18px rgba(0,0,0,0.6), -2px 2px 6px rgba(0,0,0,0.4), inset -2px 0 5px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
-    }
-
-    .book-card:hover .book-cover {
-      box-shadow: -10px 16px 28px rgba(0,0,0,0.8), -4px 4px 10px rgba(0,0,0,0.6), inset -2px 0 8px rgba(0,0,0,0.4);
-    }
-
-    .book-spine-effect {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 14px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.25) 0%, rgba(0,0,0,0.4) 40%, rgba(255,255,255,0.1) 70%, rgba(0,0,0,0.5) 100%);
-      border-right: 1px solid rgba(0,0,0,0.4);
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #141210;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #4a3828;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #73583f;
-    }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-stone-950">
-
-  <!-- HEADER / NAVBAR -->
-  <header class="sticky top-0 z-40 bg-[#161311]/95 backdrop-blur-md border-b border-amber-900/30 px-4 sm:px-8 py-3.5 transition-all shadow-lg">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+  <!-- HEADER STILE CYBER-HUTONG -->
+  <header class="sticky top-0 z-50 bg-[#0c1220]/95 backdrop-blur-md text-white border-b-2 border-yellow-500 shadow-2xl">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
       
-      <!-- Brand Title -->
-      <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
-        <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-amber-900 flex items-center justify-center shadow-lg border border-amber-400/30 text-amber-200">
-            <i data-lucide="book-open" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h1 class="font-rocksalt text-lg sm:text-xl font-bold tracking-wider text-amber-100 flex items-center gap-2">
-              BIBLIOTECA DIGITALE
+      <!-- Brand & Titolo -->
+      <div class="flex items-center gap-3">
+        <div class="bg-gradient-to-br from-yellow-400 via-amber-500 to-red-600 text-slate-950 font-black text-2xl w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl shadow-lg border border-yellow-200 shrink-0 font-calligrafico">
+          中
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg sm:text-xl md:text-2xl font-titolo font-bold text-yellow-400 tracking-tight leading-none">
+              Lingua Cinese
             </h1>
-       
+            <span class="hidden sm:inline-block px-2 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 text-[10px] font-mono font-bold border border-yellow-400/30">
+              HTML Autonomo
+            </span>
           </div>
+          <p class="text-[9px] sm:text-[10px] text-cyan-400 tracking-[0.25em] uppercase font-bold mt-1 font-mono">
+            Cyber-Hutong Interactive Hub
+          </p>
         </div>
+      </div>
 
-      <!-- Search & Filters -->
-      <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-center md:justify-end">
-        <!-- Search Input -->
-        <div class="relative w-full sm:w-64">
-          <i data-lucide="search" class="w-4 h-4 text-amber-400/60 absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input 
-            type="text" 
-            id="searchInput" 
-            placeholder="Cerca titolo, autore, genere..." 
-            oninput="handleSearch()"
-            class="w-full pl-9 pr-8 py-1.5 text-xs bg-stone-900/90 border border-amber-900/40 rounded-xl text-amber-100 placeholder:text-stone-500 focus:outline-none focus:border-amber-500/70 focus:ring-1 focus:ring-amber-500/40 transition"
-          />
-          <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-300">
-            <i data-lucide="x" class="w-3.5 h-3.5"></i>
-          </button>
-        </div>
+      <!-- Azioni Header (Filtri rapidi + Campanella Notifiche) -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Live Audio Pronounce Test Button -->
+        <button onclick="speakText('你好，欢迎学习中文！')" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-mono border border-slate-700 shadow-xs cursor-pointer" title="Ascolta Pronuncia Cinese di Benvenuto">
+          <span>🔊</span>
+          <span class="text-[11px] font-bold">Ascolta Cinese</span>
+        </button>
 
-        <!-- View Switcher -->
-        <div class="flex items-center p-1 bg-stone-900/90 border border-amber-900/40 rounded-xl">
-          <button id="viewShelfBtn" onclick="switchView('shelf')" class="px-3 py-1 text-xs font-medium rounded-lg transition flex items-center gap-1.5 bg-amber-600 text-stone-950 font-semibold shadow">
-            <i data-lucide="columns-3" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">Scaffale 3D</span>
-          </button>
-          <button id="viewGridBtn" onclick="switchView('grid')" class="px-3 py-1 text-xs font-medium rounded-lg transition flex items-center gap-1.5 text-stone-400 hover:text-amber-200">
-            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">Griglia</span>
-          </button>
-          <button id="viewBookmarksBtn" onclick="switchView('bookmarks')" class="px-3 py-1 text-xs font-medium rounded-lg transition flex items-center gap-1.5 text-stone-400 hover:text-amber-200">
-            <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">Salvati</span>
-          </button>
+        <!-- Campanella Notifiche Aggiornamenti -->
+        <div class="bell-container">
+          <span id="bell-swing" class="animated-element" title="Aggiornamenti & Novità">
+            🔔<span class="badge">●</span>
+          </span>
         </div>
       </div>
     </div>
 
-    <!-- Category Pills -->
-    <div class="max-w-7xl mx-auto mt-3 pt-2.5 border-t border-stone-800/60 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
-      <span class="text-stone-500 text-[11px] font-mono uppercase tracking-wider pl-1 shrink-0 flex items-center gap-1">
-        <i data-lucide="filter" class="w-3 h-3 text-amber-500"></i> Generi:
-      </span>
-      <div id="genreFilters" class="flex items-center gap-1.5">
-        <!-- Generato dinamicamente -->
+    <!-- BARRA CATEGORIE & RICERCA INTERATTIVA -->
+   <!-- BARRA CATEGORIE & RICERCA INTERATTIVA -->
+    <div class="bg-[#080d17] border-t border-slate-800/80 px-4 py-2.5">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        
+        <!-- Filtri Categoria a Pillola -->
+        <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 scrollbar-none" id="categoryFilterContainer">
+          <button onclick="filterCategory('all', this)" class="cat-btn active px-3 py-1 rounded-full text-xs font-bold font-mono transition-all whitespace-nowrap bg-yellow-400 text-slate-950 shadow-md">
+            🌟 Tutte
+          </button>
+          <button onclick="filterCategory('studio', this)" class="cat-btn px-3 py-1 rounded-full text-xs font-medium font-mono text-slate-300 hover:text-white hover:bg-slate-800 transition-all whitespace-nowrap border border-slate-700/60">
+            📚 Grammatica & Studio
+          </button>
+          <button onclick="filterCategory('flashcard', this)" class="cat-btn px-3 py-1 rounded-full text-xs font-medium font-mono text-slate-300 hover:text-white hover:bg-slate-800 transition-all whitespace-nowrap border border-slate-700/60">
+            🎴 Flashcard & Caratteri
+          </button>
+          <button onclick="filterCategory('media', this)" class="cat-btn px-3 py-1 rounded-full text-xs font-medium font-mono text-slate-300 hover:text-white hover:bg-slate-800 transition-all whitespace-nowrap border border-slate-700/60">
+            🎬 Video & Frame
+          </button>
+          <button onclick="filterCategory('audio', this)" class="cat-btn px-3 py-1 rounded-full text-xs font-medium font-mono text-slate-300 hover:text-white hover:bg-slate-800 transition-all whitespace-nowrap border border-slate-700/60">
+            🎧 Audio & Racconti
+          </button>
+          <button onclick="filterCategory('utility', this)" class="cat-btn px-3 py-1 rounded-full text-xs font-medium font-mono text-slate-300 hover:text-white hover:bg-slate-800 transition-all whitespace-nowrap border border-slate-700/60">
+            🛠️ Strumenti
+          </button>
+        </div>
+
+        <!-- Barra di Ricerca Card Rapida -->
+        <div class="relative w-full sm:w-64 shrink-0">
+          <input 
+            type="text" 
+            id="cardSearchInput" 
+            placeholder="Cerca risorsa, parola o tema..." 
+            oninput="searchCards(this.value)"
+            class="w-full bg-slate-900/90 text-white text-xs rounded-xl pl-8 pr-3 py-1.5 border border-slate-700 focus:outline-none focus:border-yellow-400 placeholder-slate-500 font-sans"
+          />
+          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+          <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">✕</button>
+        </div>
+
       </div>
     </div>
   </header>
-
-  <!-- MAIN CONTENT CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-    
-    <!-- Status Bar (Contatore e Info) -->
-    <div class="flex items-center justify-between text-xs text-stone-400 mb-6 bg-stone-900/60 px-4 py-2.5 rounded-xl border border-stone-800">
-      <div class="flex items-center gap-2">
-        <span id="bookCountText" class="font-medium text-amber-200">Caricamento libri...</span>
-        <span class="text-stone-600">•</span>
-        <span class="text-stone-400 text-[11px]">Aggiorna file in <code class="text-amber-400/90 font-mono">books/catalog.json</code></span>
-      </div>
-      <div class="flex items-center gap-3">
-        <label class="text-stone-400 text-[11px] hidden sm:inline">Ordina per:</label>
-        <select id="sortSelect" onchange="handleSort()" class="bg-stone-800 text-amber-100 border border-stone-700 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-amber-500">
-          <option value="featured">In Evidenza</option>
-          <option value="title">Titolo (A-Z)</option>
-          <option value="rating">Valutazione</option>
-          <option value="year">Anno</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- VIEW 1: SCAFFALE 3D (Libreria in Legno a Più Ripiani) -->
-    <div id="shelfViewContainer" class="space-y-12">
-      <!-- Gli scaffali verranno generati dinamicamente qui -->
-    </div>
-
-    <!-- VIEW 2: GRIGLIA & SEGNALIBRI -->
-    <div id="gridViewContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <!-- Le schede verranno inserite dinamicamente -->
-    </div>
-
-    <!-- Empty State -->
-    <div id="emptyState" class="hidden text-center py-20 bg-stone-900/30 rounded-3xl border border-stone-800 p-8">
-      <div class="w-16 h-16 rounded-full bg-stone-800 flex items-center justify-center mx-auto mb-4 text-stone-500">
-        <i data-lucide="book-x" class="w-8 h-8"></i>
-      </div>
-      <h3 class="font-rocksalt text-lg text-amber-200 mb-1">Nessun libro trovato</h3>
-      <p class="text-xs text-stone-400 max-w-sm mx-auto mb-5">Nessuna opera corrisponde ai filtri di ricerca selezionati.</p>
-      <button onclick="resetFilters()" class="px-4 py-2 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 rounded-xl text-xs border border-amber-500/30 transition">
-        Mostra tutti i libri
-      </button>
-    </div>
-
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="mt-auto bg-[#100e0c] border-t border-amber-950/40 py-6 text-center text-xs text-stone-500 font-mono">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span>Biblioteca Statica 100% Client-Side • Compatibile con GitHub Pages, Vercel & Netlify</span>
-      </div>
-      <p>Nessun comando di build o server richiesto • File modificabili in <code class="text-amber-400">books/</code></p>
-    </div>
-  </footer>
-
-  <!-- ========================================================================= -->
-  <!-- MODAL: LETTORE INTERATTIVO A TUTTO SCHERMO -->
-  <!-- ========================================================================= -->
-  <div id="readerModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl hidden flex flex-col transition-all">
-    
-    <!-- Reader Top Bar -->
-    <header class="bg-[#181512] text-amber-100 px-4 sm:px-6 py-2.5 border-b border-amber-900/30 flex items-center justify-between gap-4 shrink-0 shadow-lg">
-      <div class="flex items-center gap-3 truncate">
-        <button onclick="closeReader()" class="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 transition cursor-pointer" title="Chiudi Lettore (Esc)">
-          <i data-lucide="arrow-left" class="w-5 h-5"></i>
-        </button>
-        <div class="truncate">
-          <h2 id="readerBookTitle" class="font-gloria text-sm sm:text-base font-bold truncate text-amber-200">Titolo Libro</h2>
-          <p id="readerBookAuthor" class="text-[11px] text-stone-400 truncate">Autore</p>
+<br>
+    <!-- MAIN BENTO CONTAINER -->
+    <main class="relative z-10 w-full max-w-6xl mx-auto px-4 pb-12 space-y-8">
+  <section  class="space-y-3">
+        <div class="flex items-center justify-between border-b-2 border-slate-400 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-cyan-500 rounded-full border border-slate-900"></span>
+            <h2 class="text-sm font-black font-mono uppercase tracking-wider text-slate-900">1. Calendario e Frase del giorno</h2>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-700">Benvenuti</span>
         </div>
-      </div>
-
-      <!-- Controls Right -->
-      <div class="flex items-center gap-2 shrink-0">
-        <!-- Bookmark Current Book -->
-        <button id="readerBookmarkBtn" onclick="toggleCurrentBookmark()" class="p-2 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 transition cursor-pointer" title="Aggiungi ai Segnalibri">
-          <i id="readerBookmarkIcon" data-lucide="bookmark" class="w-4 h-4"></i>
-        </button>
-
-        <!-- Chapter Selector Dropdown (Se multi-capitolo) -->
-        <div id="chapterSelectContainer" class="hidden">
-          <select id="chapterDropdown" onchange="changeChapter(this.value)" class="bg-stone-800 text-amber-200 border border-stone-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-amber-500">
-          </select>
+<br>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+ <!-- ==========================================
+             1. STICKER FRASE DEL GIORNO (Collegata dinamicamente a sticker-frase.json)
+             ========================================== -->
+        <div id="quoteStickerCard" data-category="studio flashcard" data-title="frase del giorno qian li zhi xing wen gu er zhi xin" class="bento-card col-span-1 sm:col-span-1 row-span-1 sticker-rotate-left pin-sticker relative bg-amber-200/95 text-amber-950 p-5 rounded-2xl shadow-xl border border-amber-300 transition duration-300 flex flex-col justify-between min-h-[160px]">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span id="quoteLabel" class="inline-block px-2.5 py-0.5 rounded-full bg-amber-300/80 font-handwriting text-sm font-bold text-amber-900">
+                Frase del giorno
+              </span>
+              <button type="button" onclick="speakQuote()" class="text-xs hover:scale-125 transition-transform cursor-pointer p-1 bg-amber-300/60 hover:bg-amber-300 rounded-full w-6 h-6 flex items-center justify-center shadow-xs" title="Ascolta pronuncia cinese">
+                🔊
+              </button>
+            </div>
+            <p id="quoteHanzi" class="text-xl font-bold font-sans text-slate-900 mb-1">千里之行，始于足下.</p>
+            <p id="quotePinyin" class="text-xs text-amber-800 italic mb-2 font-mono">Qiān lǐ zhī xíng, shǐ yú zú xià.</p>
+            <p id="quoteTranslation" class="text-xs text-slate-700 leading-relaxed font-medium">Un viaggio di mille miglia comincia con un solo passo.</p>
+          </div>
+          <div class="text-[9px] text-amber-800/80 font-mono border-t border-amber-300/80 pt-1.5 flex justify-between items-center">
+            <span id="quoteAuthor">Laozi · 老子</span>
+            <span class="text-amber-900 font-bold">★ Saggezza</span>
+          </div>
         </div>
 
-        <!-- Reload / Open in new tab -->
-        <a id="readerExternalLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-600/20 hover:bg-amber-600/40 text-amber-300 border border-amber-500/30 text-xs transition">
-          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-          <span class="text-[11px]">Nuova Scheda</span>
-        </a>
+        <!-- ==========================================
+             2. CALENDARIO INTERATTIVO (Invariato nel design cobalt-asymmetric con navigazione e note)
+             ========================================== -->
+        <div data-category="utility" data-title="calendario data mese giorni" class="bento-card relative overflow-hidden col-span-1 sm:col-span-2 row-span-1 p-3.5 bg-blue-600 text-white border-2 border-slate-950 rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-lg rounded-bl-lg shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between min-h-[160px] select-none">
+          <!-- Header con Mese + Frecce Navigazione -->
+          <div class="flex items-center justify-between border-b border-blue-500/60 pb-1 shrink-0">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[9px] font-mono font-black uppercase tracking-wider bg-white/20 px-1.5 py-0.5 rounded-full border border-white/20">
+                ★ 日历
+              </span>
+              <span id="cal-month-title" class="text-[11px] font-black text-white font-sans tracking-tight">
+                Agosto 2026
+              </span>
+              <span id="cal-month-cn" class="text-[10px] font-bold text-amber-300 font-calligrafico ml-0.5">
+                八月
+              </span>
+            </div>
+            
+            <!-- Controlli Mese Precedente / Successivo -->
+            <div class="flex items-center gap-1">
+              <button onclick="changeMonth(-1)" class="w-5 h-5 rounded bg-white/20 hover:bg-white/30 border border-white/30 text-[9px] font-bold flex items-center justify-center cursor-pointer transition-colors shadow-2xs text-white" title="Mese precedente">
+                ◀
+              </button>
+              <button onclick="changeMonth(1)" class="w-5 h-5 rounded bg-white/20 hover:bg-white/30 border border-white/30 text-[9px] font-bold flex items-center justify-center cursor-pointer transition-colors shadow-2xs text-white" title="Mese successivo">
+                ▶
+              </button>
+            </div>
+          </div>
 
-        <button onclick="closeReader()" class="p-2 rounded-lg bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/40 transition ml-2 cursor-pointer" title="Chiudi (Esc)">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-    </header>
+          <!-- Giorni della Settimana (Ideogrammi Cinesi) -->
+          <div class="grid grid-cols-7 text-center text-[8px] font-bold text-blue-200 pt-0.5 font-mono shrink-0">
+            <span>一</span>
+            <span>二</span>
+            <span>三</span>
+            <span>四</span>
+            <span>五</span>
+            <span class="text-amber-300">六</span>
+            <span class="text-amber-300">日</span>
+          </div>
 
-    <!-- Reader Progress Bar -->
-    <div class="w-full bg-stone-900 h-1 shrink-0 overflow-hidden">
-      <div id="readerProgressBar" class="bg-gradient-to-r from-amber-500 to-amber-300 h-full w-0 transition-all duration-300"></div>
-    </div>
+          <!-- Griglia Giorni del Mese -->
+          <div id="cal-days-grid" class="grid grid-cols-7 gap-y-0.5 gap-x-0.5 text-center text-[9px] font-bold py-0.5 leading-tight flex-1">
+            <!-- Generato via JavaScript -->
+          </div>
 
-    <!-- Reader Body / Iframe Canvas -->
-    <div class="flex-1 w-full h-full relative bg-white overflow-hidden flex flex-col">
-      <iframe id="readerIframe" src="about:blank" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
-      
-      <!-- Multi-Chapter HTML/Text Reader container (se non iframe) -->
-      <div id="readerTextContainer" class="hidden flex-1 overflow-y-auto p-6 sm:p-12 md:p-20 max-w-4xl mx-auto bg-[#faf6ee] text-[#2c241d]">
-        <div id="readerTextContent" class="prose max-w-none text-base sm:text-lg leading-relaxed"></div>
-      </div>
-    </div>
+          <!-- Footer con Auspicio Tradizionale / Segno Zodiacale -->
+          <div class="flex items-center justify-between border-t border-blue-500/60 pt-1 text-[8px] font-mono text-blue-200 shrink-0">
+            <span class="font-bold text-amber-300 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> 丙午年 · Anno del Cavallo
+            </span>
+            <span id="cal-selected-hint" class="text-blue-100 font-sans text-[8px]">Oggi: Studio Cinese</span>
+          </div>
+        </div>
+</div>
+</section>
+   <!-- ========================================================= -->
+      <!-- SEZIONE 2: SPAZIO SOCIAL-->
+      <!-- ========================================================= -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b-2 border-slate-400 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-purple-500 rounded-full border border-slate-900"></span>
+            <h2 class="text-sm font-black font-mono uppercase tracking-wider text-slate-900">2. Spazio Social</h2>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-700">Audio, Video, Foto, Facebook </span>
+        </div>
+<br>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+   <!-- ==========================================
+             3. FRAME SOCIAL MOBILE 9:16
+             ========================================== -->
+        <div data-category="media" data-title="social mobile post feed" class="bento-card col-span-1 sm:col-span-2 row-span-4 bg-slate-950 border-4 border-slate-800 rounded-[2.5rem] shadow-2xl p-2.5 flex flex-col justify-between relative overflow-hidden min-h-[500px]">
+          <div class="relative w-full h-[650px] max-h-[78vh] rounded-3xl overflow-hidden bg-slate-900 shadow-inner">
+            <iframe 
+              src="post/social.html" 
+              class="w-full h-full border-0 rounded-3xl"
+              title="Angolo Sociale"
+              loading="lazy">
+            </iframe>
+          </div>
+        </div>
 
-    <!-- Multi-Chapter Navigation Bar (Se il libro ha capitoli) -->
-    <div id="chapterNavFooter" class="hidden bg-[#161311] border-t border-amber-950/60 px-6 py-2.5 flex items-center justify-between text-xs text-amber-200 shrink-0">
-      <button id="prevChapterBtn" onclick="prevChapter()" class="flex items-center gap-1 px-4 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 disabled:opacity-30 disabled:pointer-events-none transition">
-        <i data-lucide="chevron-left" class="w-4 h-4"></i>
-        <span>Capitolo Precedente</span>
-      </button>
+        <!-- ==========================================
+             4. FRAME JSON CINA MOBILE 9:16
+             ========================================== -->
+        <div data-category="media" data-title="cina frame json info mobile" class="bento-card col-span-1 sm:col-span-2 row-span-4 bg-slate-950 border-4 border-slate-800 rounded-[2.5rem] shadow-2xl p-2.5 flex flex-col justify-between relative overflow-hidden min-h-[500px]">
+          <div class="relative overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] w-full h-[650px] max-h-[78vh] rounded-3xl border-2 border-indigo-900/40 bg-slate-900 shadow-inner">
+            <iframe 
+              src="frame/cina.html" 
+              class="w-full h-full border-0 rounded-3xl"
+              title="Cina Frame"
+              scrolling="auto"
+              loading="lazy">
+            </iframe>
+          </div>
+        </div>
 
-      <span id="chapterStatusLabel" class="font-mono text-stone-400">Capitolo 1 di 1</span>
+        <!-- ==========================================
+             5. FRAME VIDEO METRO MOBILE 9:16 (Pulito senza barre superiori che coprono il contenuto)
+             ========================================== -->
+        <div data-category="media" data-title="video metro mobile transito" class="bento-card col-span-1 sm:col-span-2 row-span-4 bg-slate-950 border-4 border-slate-800 rounded-[2.5rem] shadow-2xl p-2.5 flex flex-col justify-between relative overflow-hidden min-h-[520px]">
+          <div class="relative w-full h-[650px] max-h-[80vh] overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] rounded-3xl border-2 border-slate-800 bg-slate-900 shadow-inner">
+            <iframe 
+              src="frame/giornata.html" 
+              class="w-full h-full border-0 rounded-3xl"
+              style="width: 100%; height: 100%; min-height: 600px;"
+              title="Metro Frame"
+              scrolling="auto"
+              loading="lazy">
+            </iframe>
+          </div>
+        </div>
 
-      <button id="nextChapterBtn" onclick="nextChapter()" class="flex items-center gap-1 px-4 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold transition">
-        <span>Capitolo Successivo</span>
-        <i data-lucide="chevron-right" class="w-4 h-4"></i>
-      </button>
-    </div>
+        <!-- ==========================================
+             6. FRAME DINAMICO MICE ANIMAZIONE (Pulito senza barre superiori che coprono il contenuto)
+             ========================================== -->
+        <div data-category="media" data-title="dinamico mice webm animazione video" class="bento-card col-span-1 sm:col-span-1 row-span-4 bg-slate-950 border-4 border-slate-800 rounded-[2.5rem] shadow-2xl p-2.5 flex flex-col justify-between relative overflow-hidden min-h-[520px]">
+          <div class="relative w-full h-[650px] max-h-[80vh] overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] rounded-3xl border-2 border-emerald-950 bg-slate-900 shadow-inner flex items-center justify-center">
+            <iframe 
+              src="frame/mice.webm" 
+              class="w-full h-full border-0 rounded-3xl"
+              style="width: 100%; height: 100%; min-height: 600px;"
+              title="Mice Animation"
+              scrolling="auto"
+              loading="lazy">
+            </iframe>
+          </div>
+        </div>
+<!-- ==========================================
+             8. FRAME POLAROID 1:1 FACEBOOK (Invariata esattamente come richiesta!)
+             ========================================== -->
+        <div data-category="media" data-title="facebook social polaroid foto" class="bento-card relative col-span-1 sm:col-span-1 row-span-2 p-3.5 bg-white border-2 border-slate-900 rounded-3xl shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between rotate-1 hover:rotate-0 transition-transform min-h-[320px]">
+          <!-- Washi tape in alto centrato -->
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-300/90 text-amber-950 text-[10px] font-mono font-black px-6 py-0.5 -rotate-2 shadow-xs border-t border-b border-amber-400">
+            Facebook
+          </div>
 
+          <!-- Foto Quadrata -->
+          <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-300 group mt-1">
+            <img 
+              src="img/facebook.png" 
+              alt="facebook" 
+              onerror="this.src='https://images.unsplash.com/photo-1544717305-2782549b5136?w=400&q=80'"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <a href="facebook/facebook_page.html">   
+              <button class="absolute bottom-2 right-2 px-2 py-0.5 bg-slate-950/80 text-[9px] font-mono text-white rounded-md cursor-pointer hover:bg-slate-900">
+                35mm · f/1.8
+              </button>
+            </a>
+          </div>
+
+          <!-- Didascalia Polaroid -->
+          <div class="pt-3 pb-1 text-center font-mono">
+            <div class="text-xs font-black text-slate-900">Pagina Social</div>
+            <div class="text-[10px] text-slate-500">Video-Reel-Post-Foto</div>
+          </div>
+        </div>
+</div>
+</section>
+ <!-- ========================================================= -->
+      <!-- SEZIONE 3: MODULI DIDATTICI, VOCABOLARIO  -->
+      <!-- ========================================================= -->
+      <section id=" class="space-y-3">
+        <div class="flex items-center justify-between border-b-2 border-slate-400 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-purple-500 rounded-full border border-slate-900"></span>
+            <h2 class="text-sm font-black font-mono uppercase tracking-wider text-slate-900">3. Grammatica & Vocabolario</h2>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-700">Grammatica-Vocabolari</span>
+        </div>
+<br>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- ==========================================
+             18. HERO COBALTO GRAMMATICA CON WASHI TAPE
+             ========================================== -->
+        <div data-category="studio" data-title="grammatica regole frasi aggettivi classificatori verbi sintassi" class="bento-card relative col-span-1 sm:col-span-2 row-span-2 p-5 sm:p-8 bg-blue-600 text-white rounded-[2.5rem] rounded-tr-lg border-3 border-slate-950 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between overflow-hidden min-h-[320px]">
+          <!-- Nastro Washi Tape Inclinato -->
+          <div class="absolute -top-3 right-6 sm:right-12 bg-amber-300 text-amber-950 text-[10px] font-mono font-black px-4 py-1.5 sm:py-2.5 rotate-3 shadow-md uppercase tracking-wider border-t border-b border-amber-400">
+            ★ GRAMMATICA CINESE
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-xs font-mono font-black rounded-full border border-white/30">
+              语法 / GRAMMAR
+            </span>
+            <span class="w-3 h-3 rounded-full bg-emerald-400 ring-4 ring-white/30 animate-pulse"></span>
+          </div>
+
+          <div class="my-4 space-y-2">
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
+              所有汉语语法规则
+            </h2>
+            <a href="grammatica.html" class="block text-sm sm:text-base text-blue-100 font-medium leading-relaxed max-w-md hover:underline">
+              Tutte le regole della Grammatica cinese, strutture della frase e particelle modali.
+            </a>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-blue-500/60">
+            <a href="grammatica.html" class="px-3 py-1 bg-blue-700/80 hover:bg-blue-800 text-white text-xs font-mono font-bold rounded-xl border border-blue-400/40 cursor-pointer">形容词 Aggettivi</a>
+            <a href="grammatica.html" class="px-3 py-1 bg-blue-700/80 hover:bg-blue-800 text-white text-xs font-mono font-bold rounded-xl border border-blue-400/40 cursor-pointer">分类词 Classificatori</a>
+            <a href="grammatica.html" class="px-3 py-1 bg-blue-700/80 hover:bg-blue-800 text-white text-xs font-mono font-bold rounded-xl border border-blue-400/40 cursor-pointer">副词 Avverbi</a>
+          </div>
+        </div>
+<!-- ==========================================
+             13. VOCABOLARIO MODAL
+             ========================================== -->
+        <div data-category="studio" data-title="vocabolario parole modal dizionario" class="bento-card col-span-1 sm:col-span-1 row-span-1 p-5 bg-[#065f46] text-white border-2 border-slate-900 rounded-[2rem] shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between min-h-[160px]">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono font-black uppercase text-emerald-200 bg-emerald-800/80 px-2 py-0.5 rounded-full">
+              词汇 · VOCABOLARIO
+            </span>
+            <button onclick="openModal()" class="text-xs font-bold text-emerald-300 bg-emerald-900 hover:bg-emerald-950 px-2.5 py-1 rounded-md border border-emerald-700/50 cursor-pointer">
+              apri ↗
+            </button>
+          </div>
+
+          <div class="my-1">
+            <div class="text-2xl sm:text-3xl font-black tracking-tight text-white">Vocabolario</div>
+            <p class="text-[11px] text-emerald-100 font-medium mt-0.5">Nuovo vocabolario interattivo popup.</p>
+          </div>
+
+          <div class="w-full bg-emerald-800 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-emerald-300 h-full w-[94%] rounded-full"></div>
+          </div>
+        </div>
+  <!-- ==========================================
+             20. CARD VOCABOLARIO TEMATICO 📌 (Grid Paper)
+             ========================================== -->
+        <div data-category="studio" data-title="vocabolario tematico temi argomenti parole contesti" class="bento-card relative overflow-hidden col-span-1 sm:col-span-1 row-span-1 p-5 bg-[#fefce8] text-slate-900 border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] rotate-[-1.5deg] hover:rotate-0 transition-transform flex flex-col justify-between min-h-[160px]">
+          <!-- Trama a quadretti (Grid Paper) -->
+          <div class="absolute inset-0 pointer-events-none opacity-30" style="background-image: linear-gradient(#ca8a04 1px, transparent 1px), linear-gradient(90deg, #ca8a04 1px, transparent 1px); background-size: 14px 14px;"></div>
+
+          <!-- Spilla 📌 in alto al centro -->
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 text-lg select-none z-10">
+            📌
+          </div>
+
+          <!-- Header Card -->
+          <div class="flex items-center justify-between pt-1 relative z-10">
+            <span class="text-[10px] font-black uppercase tracking-wider text-amber-950 bg-amber-300/90 px-2 py-0.5 rounded border border-amber-400">
+              分类词汇 / TEMI
+            </span>
+            <span class="text-xs font-mono font-bold text-amber-900">#03</span>
+          </div>
+
+          <!-- Contenuto -->
+          <div class="my-1 relative z-10">
+            <h4 class="text-xs sm:text-sm font-black text-slate-900 font-sans leading-snug">
+              Vocabolario Tematico
+            </h4>
+            <p class="text-[10px] text-amber-900/90 font-medium mt-0.5">
+              Parole, verbi e termini divisi per argomento e contesto
+            </p>
+          </div>
+
+          <!-- Footer con Link -->
+          <div class="text-[10px] font-mono text-amber-950 font-bold flex justify-between items-center border-t border-amber-300/80 pt-1 relative z-10">
+            <span class="text-slate-600">Schede tematiche</span>
+            <a href="vocabolario.html">
+              <button class="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black px-2 py-0.5 rounded border border-amber-900/30 shadow-xs cursor-pointer">
+                Esplora ➔
+              </button>
+            </a>
+          </div>
+        </div>
+  <!-- ==========================================
+             15. VERA E PROPRIA FLASHCARD INTERATTIVA 3D (Novità richiesta!)
+             ========================================== -->
+        <div data-category="flashcard studio" data-title="flashcard interattiva 3d hanzi pinyin traduzione carta" class="bento-card relative col-span-1 sm:col-span-1 row-span-2 p-3.5 bg-white border-2 border-slate-900 rounded-3xl shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between rotate-1 hover:rotate-0 transition-transform min-h-[320px]">
+          
+          <!-- Washi tape in alto centrato -->
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-300/95 text-amber-950 text-[9px] font-mono font-black px-4 py-0.5 -rotate-2 shadow-xs border-t border-b border-amber-400 z-30">
+            🎴 闪卡 / FLASHCARD VERA
+          </div>
+
+          <!-- Flashcard 3D Flipper Box -->
+          <div class="flashcard-3d-wrap w-full h-[210px] mt-1 relative select-none" onclick="toggleFlashcardFlip()" title="Clicca per girare la carta!">
+            <div id="interactiveFlashcard" class="flashcard-inner w-full h-full">
+              
+              <!-- FRONTE FLASHCARD (Ideogramma grande + Pinyin + Audio) -->
+              <div class="flashcard-face flashcard-front bg-gradient-to-br from-amber-50 to-orange-100 border-2 border-amber-400/80 p-3.5 flex flex-col justify-between shadow-md">
+                <div class="flex items-center justify-between text-[9px] font-mono font-bold text-amber-900">
+                  <span id="fcCategory" class="bg-amber-200 px-1.5 py-0.5 rounded border border-amber-300">HSK 1</span>
+                  <span id="fcIndex" class="text-slate-500">1 / 10</span>
+                </div>
+
+                <div class="my-auto py-1">
+                  <div id="fcHanzi" class="text-5xl font-calligrafico font-black text-slate-900 tracking-wider">你好</div>
+                  <div id="fcPinyin" class="text-sm font-mono font-bold text-amber-800 mt-1">nǐ hǎo</div>
+                </div>
+
+                <div class="flex items-center justify-between text-[10px] text-amber-950 font-bold border-t border-amber-200/80 pt-1">
+                  <span class="text-slate-500 text-[9px]">🔄 Clicca per girare</span>
+                  <button type="button" onclick="event.stopPropagation(); speakFlashcard();" class="p-1 hover:scale-125 transition-transform" title="Ascolta">
+                    🔊
+                  </button>
+                </div>
+              </div>
+
+              <!-- RETRO FLASHCARD (Traduzione italiana + Esempio d'uso) -->
+              <div class="flashcard-face flashcard-back bg-gradient-to-br from-slate-900 to-indigo-950 border-2 border-indigo-500 text-white p-3.5 flex flex-col justify-between shadow-xl">
+                <div class="flex items-center justify-between text-[9px] font-mono text-indigo-300">
+                  <span class="bg-indigo-900/80 px-1.5 py-0.5 rounded border border-indigo-700">Traduzione & Esempio</span>
+                  <span>🇮🇹 Italiano</span>
+                </div>
+
+                <div class="my-auto py-1 text-center">
+                  <div id="fcMeaning" class="text-base font-bold text-amber-300">Ciao / Salve</div>
+                  <div id="fcExample" class="text-[11px] text-slate-200 mt-2 font-mono bg-black/40 p-1.5 rounded-lg border border-indigo-800/60 leading-snug">
+                    “你好，很高兴认识你！”<br>
+                    <span class="text-cyan-300 text-[9px]">Piacere di conoscerti!</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between text-[9px] font-mono text-indigo-300 border-t border-indigo-800/80 pt-1">
+                  <span id="fcStrokes">Tratti: 13</span>
+                  <span class="text-amber-400">Gira 🔄</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Controlli Flashcard: Precedente / Gira / Successiva / Casuale -->
+          <div class="pt-2 flex items-center justify-between gap-1">
+            <button onclick="prevFlashcard()" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-[10px] font-bold text-slate-800 cursor-pointer shadow-2xs">
+              ◀
+            </button>
+            <button onclick="toggleFlashcardFlip()" class="px-2 py-1 bg-amber-400 hover:bg-amber-300 border border-slate-900 rounded-lg text-[10px] font-black text-slate-950 cursor-pointer shadow-xs">
+              🔄 Gira
+            </button>
+            <button onclick="nextFlashcard()" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-[10px] font-bold text-slate-800 cursor-pointer shadow-2xs">
+              ▶
+            </button>
+            <button onclick="randomFlashcard()" class="px-2 py-1 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 rounded-lg text-[10px] font-bold text-emerald-800 cursor-pointer shadow-2xs" title="Carta Casuale">
+              🎲
+            </button>
+          </div>
+
+          <!-- Didascalia e Link a flashcards.html -->
+          <div class="pt-1.5 text-center font-mono border-t border-slate-200 mt-1 flex items-center justify-between text-[10px]">
+            <span class="text-slate-600 font-bold">Banco Studio</span>
+            <a href="flashcards.html" class="text-blue-600 font-bold hover:underline">Tutte ➔</a>
+          </div>
+
+        </div>
+</div>
+</section>
+ <!-- ========================================================= -->
+      <!-- SEZIONE 3: Caratteri e esercizi -->
+      <!-- ========================================================= -->
+      <section  class="space-y-3">
+        <div class="flex items-center justify-between border-b-2 border-slate-400 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-purple-500 rounded-full border border-slate-900"></span>
+            <h2 class="text-sm font-black font-mono uppercase tracking-wider text-slate-900">4. Esercizi e Caratteri</h2>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-700">Esercizi-Ideogrammi-Radicali</span>
+        </div>
+<br>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <!-- ==========================================
+             11. CARD Esercizi
+             ========================================== -->
+      <div id="card-quiz" data-category="studio flashcard" data-title="quiz test rapido esercizi domande punteggio" class="bento-card col-span-1 p-5 bg-[#bef264] text-slate-950 border-2 border-slate-900 rounded-3xl neo-shadow flex flex-col justify-between min-h-[300px]">
+          <div class="flex items-center justify-between border-b-2 border-slate-900 pb-2">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-black bg-slate-950 text-lime-300 px-2 py-0.5 rounded">
+                QUIZ 🎯
+              </span>
+              <span class="text-xs font-black text-slate-950">Test Rapido</span>
+            </div>
+            <span id="quiz-score-display" class="text-[10px] font-mono font-black bg-white px-2 py-0.5 rounded-md border border-slate-900">
+              Punti: 0/0
+            </span>
+          </div>
+
+          <div class="my-2">
+            <div id="quiz-question-text" class="text-xs font-black text-slate-950 mb-2 leading-snug">
+              Caricamento domanda...
+            </div>
+
+            <div id="quiz-options-container" class="space-y-1.5">
+              <!-- Generato dinamicamente da JS -->
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-2 border-t-2 border-slate-900">
+            <div class="flex items-center justify-between text-[10px] font-mono font-bold">
+              <span id="quiz-progress-text" class="text-slate-800">Domanda 1 di 4</span>
+              <button 
+                onclick="nextQuizQuestion()"
+                class="px-2.5 py-1 bg-slate-950 text-white text-[10px] font-black rounded-lg border border-slate-900 neo-shadow-sm hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                Prossima ➔
+              </button>
+            </div>
+            <a href="esercizi.html" class="block">
+              <button class="w-full px-3 py-1.5 bg-slate-950 text-white text-xs font-black rounded-xl border border-slate-900 neo-shadow-sm hover:bg-slate-800 transition-colors cursor-pointer">
+                Tutti gli Esercizi ➔
+              </button>
+            </a>
+          </div>
+        </div>
+  <!-- ==========================================
+             14. AUDIO VIDEO REEL PREVIEW
+             ========================================== -->
+        <div data-category="audio media" data-title="audio video esercizi ascolto reel ascoltare" class="bento-card relative col-span-1 sm:col-span-1 row-span-2 rounded-3xl overflow-hidden bg-slate-950 border-2 border-slate-800 shadow-2xl group flex flex-col justify-between p-4 text-white min-h-[320px]">
+          <img 
+            src="img/libriaudio.png" 
+            alt="Reel Preview" 
+            onerror="this.src='https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80'"
+            class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-60"
+          />
+
+          <div class="relative z-10 flex items-center justify-between">
+            <span class="px-2.5 py-0.5 bg-rose-600 text-white text-[10px] font-bold rounded-full shadow-sm">
+              Video e Audio
+            </span>
+            <span class="text-xs font-mono">🔊</span>
+          </div>
+
+          <div class="relative z-10 ml-auto space-y-3 text-right">
+            <div class="flex flex-col items-center">
+              <button onclick="likeAudio(this)" class="w-8 h-8 rounded-full bg-slate-900/80 hover:bg-rose-600 flex items-center justify-center text-sm shadow-md transition-colors cursor-pointer">
+                ❤️
+              </button>
+              <span id="audioLikesCount" class="text-[9px] font-bold mt-0.5">2.4k</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <a href="audiovideo.html" class="w-8 h-8 rounded-full bg-slate-900/80 hover:bg-indigo-600 flex items-center justify-center text-sm shadow-md transition-colors cursor-pointer">
+                💬
+              </a>
+              <span class="text-[9px] font-bold mt-0.5">184</span>
+            </div>
+          </div>
+
+          <div class="relative z-10 bg-slate-950/85 backdrop-blur-md p-2.5 rounded-xl border border-slate-800">
+            <div class="text-[11px] font-bold">Video ed esercizi di ascolto</div>
+            <a href="audiovideo.html" class="inline-flex items-center gap-1 text-[10px] text-cyan-300 font-bold hover:underline mt-0.5">
+              <span>Ascolta tracce</span> 🎧 ➔
+            </a>
+          </div>
+        </div>
+
+ <!-- ==========================================
+             24. CARD COBALTO RADICALI CINESI
+             ========================================== -->
+        <div data-category="studio flashcard" data-title="radicali caratteri ideogrammi elementi base hanzi" class="bento-card relative overflow-hidden col-span-1 sm:col-span-1 row-span-1 p-5 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white border-2 border-slate-950 rounded-tl-[2.5rem] rounded-br-[2.5rem] rounded-tr-lg rounded-bl-lg shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between min-h-[160px] group">
+          <!-- Sigillo / Ideogramma Grande di Sfondo Filigrana -->
+          <div class="absolute -right-3 -bottom-4 select-none pointer-events-none opacity-20 font-calligrafico text-7xl text-amber-300 transform -rotate-12 group-hover:scale-110 group-hover:opacity-30 transition-all duration-500">
+            龙
+          </div>
+          <!-- Timbro Sigillo Cinese Rosso/Oro ad incisione -->
+          <div class="absolute top-2 right-4 w-7 h-7 rounded bg-red-700/80 border border-amber-300 flex items-center justify-center text-[11px] font-calligrafico text-amber-200 shadow-inner rotate-6 select-none pointer-events-none">
+            印
+          </div>
+
+          <div class="flex items-center justify-between relative z-10">
+            <span class="text-[10px] font-mono font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full border border-white/20">
+              ★ 部首 / RADICALI
+            </span>
+            <span class="text-xs font-bold text-blue-200 mr-7">2026</span>
+          </div>
+
+          <div class="relative z-10">
+            <h4 class="text-sm font-black text-white flex items-center gap-1.5">
+              Radicali cinesi
+            </h4>
+            <p class="text-[11px] text-blue-100 mt-0.5">Impara i radicali per comprendere le chiavi dei caratteri</p>
+          </div>
+
+          <div class="text-[10px] font-mono text-blue-200 flex justify-between border-t border-blue-500/80 pt-1 relative z-10">
+            <span class="text-amber-200">Elementi Base</span>
+            <a href="Radicali_Cinesi.html">
+              <button class="text-blue-200 font-mono hover:text-white cursor-pointer font-bold">✦ 东方美学 ↗</button>
+            </a>
+          </div>
+        </div>
+ <!-- ==========================================
+             26. CARD SMERALDO HANZI IDEOGRAMMI
+             ========================================== -->
+        <div data-category="studio flashcard" data-title="ideogrammi hanzi caratteri cinesi calligrafia" class="bento-card relative overflow-hidden col-span-1 sm:col-span-1 row-span-1 p-5 bg-gradient-to-br from-[#065f46] to-[#022c22] text-white border-2 border-slate-900 rounded-[2rem] shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between min-h-[160px] group">
+          <!-- Ideogramma Smeraldo Sfondo Filigrana -->
+          <div class="absolute -right-2 -bottom-3 select-none pointer-events-none opacity-20 font-calligrafico text-7xl text-emerald-300 transform -rotate-6 group-hover:scale-110 group-hover:opacity-30 transition-all duration-500">
+            极
+          </div>
+
+          <div class="flex items-center justify-between relative z-10">
+            <span class="text-[10px] font-mono font-black uppercase text-emerald-200 bg-emerald-800/90 px-2 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              IDEOGRAMMI
+            </span>
+            <a href="caratteri.html">
+              <button class="text-xs font-bold text-emerald-300 bg-emerald-950/80 border border-emerald-600/40 px-2 py-0.5 rounded-md shadow-xs hover:bg-emerald-900 cursor-pointer">
+                Vai ↗
+              </button>
+            </a>
+          </div>
+
+          <div class="my-1 relative z-10">
+            <div class="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-baseline gap-2">
+              表意符号
+              <span class="text-[10px] font-mono text-emerald-300 font-normal">汉字 / HANZI</span>
+            </div>
+            <p class="text-[11px] text-emerald-100 font-medium mt-0.5">Scopri gli ideogrammi e il loro ordine dei tratti</p>
+          </div>
+
+          <div class="w-full bg-emerald-950/80 rounded-full h-1.5 overflow-hidden relative z-10 border border-emerald-800/50">
+            <div class="bg-gradient-to-r from-emerald-400 to-teal-200 h-full w-[94%] rounded-full"></div>
+          </div>
+        </div>
+</div>
+</section>
+ <!-- ========================================================= -->
+      <!-- SEZIONE 5: MODULI DIDATTICI, VOCABOLARIO AUDIO & VIDEO -->
+      <!-- ========================================================= -->
+      <section  class="space-y-3">
+        <div class="flex items-center justify-between border-b-2 border-slate-400 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-purple-500 rounded-full border border-slate-900"></span>
+            <h2 class="text-sm font-black font-mono uppercase tracking-wider text-slate-900">5. Frasario, Dialoghi, TV e Manhua</h2>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-700">Frasi - Vocaboli - Video</span>
+        </div>
+<br>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <!-- ==========================================
+             10. CARD FRASARIO 📌
+             ========================================== -->
+<div data-category="audio studio" data-title="frasario ristorante cibo beijing street food frasi cinesi" class="bento-card relative col-span-1 p-4 bg-[#fefce8] text-slate-900 border-2 border-slate-900 rounded-3xl neo-shadow flex flex-col justify-between font-mono min-h-[300px]">
+          <div class="chinese-stamp absolute top-3 right-3 px-1.5 py-0.5 text-[9px] select-none pointer-events-none shadow-xs">
+            点单完成 OK
+          </div>
+
+          <div>
+            <div class="border-b border-dashed border-slate-400 pb-2 mb-2">
+              <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">BEIJING STREET FOOD</div>
+              <h4 class="text-xs font-black text-slate-950 font-sans">Frasario al Ristorante 🍜</h4>
+            </div>
+
+            <div class="space-y-1.5 text-[10px]">
+              <div class="p-1.5 rounded-lg bg-amber-100 border border-amber-300 cursor-pointer hover:bg-amber-200 transition-colors" onclick="speakChinese('请给我这个')">
+                <div class="font-bold text-slate-950 font-hanzi">1. 请给我这个 🔊</div>
+                <div class="text-[9px] text-slate-600 font-sans">"Questo per favore (Qǐng gěi wǒ zhège)"</div>
+              </div>
+
+              <div class="p-1.5 rounded-lg bg-amber-100 border border-amber-300 cursor-pointer hover:bg-amber-200 transition-colors" onclick="speakChinese('请少放点辣')">
+                <div class="font-bold text-slate-950 font-hanzi">2. 请少放点辣 🌶️</div>
+                <div class="text-[9px] text-slate-600 font-sans">"Meno piccante per favore (Qǐng shǎo fàng diǎn là)"</div>
+              </div>
+
+              <div class="p-1.5 rounded-lg bg-amber-100 border border-amber-300 cursor-pointer hover:bg-amber-200 transition-colors" onclick="speakChinese('请给我一杯水')">
+                <div class="font-bold text-slate-950 font-hanzi">3. 请给我一杯水 💧</div>
+                <div class="text-[9px] text-slate-600 font-sans">"Un po' d'acqua per favore (Qǐng gěi wǒ yībēi shuǐ)"</div>
+              </div>
+
+              <div class="p-1.5 rounded-lg bg-amber-100 border border-amber-300 cursor-pointer hover:bg-amber-200 transition-colors" onclick="speakChinese('买单，谢谢')">
+                <div class="font-bold text-slate-950 font-hanzi">4. 买单，谢谢 💳</div>
+                <div class="text-[9px] text-slate-600 font-sans">"Il conto per favore (Mǎidān, xièxiè)"</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-2 border-t border-dashed border-slate-400">
+            <div class="text-[10px] text-slate-600 flex justify-between items-center">
+              <span>Clicca per parlare</span>
+              <span class="text-emerald-800 font-bold">Pronuncia HD 🔊</span>
+            </div>
+            <a href="frasi-cinesi.html" class="block">
+              <button class="w-full px-3 py-1.5 bg-slate-950 text-white text-xs font-black rounded-xl border border-slate-900 neo-shadow-sm hover:bg-slate-800 transition-colors cursor-pointer">
+                Accedi al Frasario ➔
+              </button>
+            </a>
+          </div>
+        </div>
+   <!-- ==========================================
+             19. MANHUA FUMETTI POLAROID
+             ========================================== -->
+        <div data-category="media studio" data-title="manhua fumetti dialoghi manga cinesi" class="bento-card relative col-span-1 sm:col-span-1 row-span-2 p-3.5 bg-white border-2 border-slate-900 rounded-3xl shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between rotate-1 hover:rotate-0 transition-transform min-h-[320px]">
+          <!-- Washi tape in alto centrato -->
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-300/90 text-amber-950 text-[9px] font-mono font-black px-4 py-0.5 -rotate-2 shadow-xs border-t border-b border-amber-400">
+            漫画
+          </div>
+
+          <!-- Foto Quadrata -->
+          <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-300 group mt-1">
+            <img 
+              src="img/mahua.png" 
+              alt="manhua" 
+              onerror="this.src='https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&q=80'"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <a href="manhua.html">
+              <button class="absolute bottom-2 right-2 px-2 py-0.5 bg-slate-950/80 text-[9px] font-mono text-white rounded-md cursor-pointer hover:bg-slate-900">
+                35mm · f/1.8
+              </button>
+            </a>
+          </div>
+
+          <!-- Didascalia Polaroid -->
+          <div class="pt-3 pb-1 text-center font-mono">
+            <div class="text-xs font-black text-slate-900">Manhua</div>
+            <div class="text-[10px] text-slate-500">Dialoghi dal mondo dei fumetti</div>
+          </div>
+        </div>
+   <!-- ==========================================
+             16. TV CINESE MP4 STREAM
+             ========================================== -->
+        <div data-category="media" data-title="tv cinese video cctv streaming mp4" class="bento-card relative col-span-1 sm:col-span-1 row-span-1 rounded-3xl overflow-hidden bg-slate-950 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] group flex flex-col justify-between p-4 min-h-[160px]">
+          <img 
+            src="img/tv.jpeg" 
+            alt="Sfondo TV" 
+            onerror="this.src='https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&q=80'"
+            class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-500"
+          >
+          <div class="absolute inset-0 bg-gradient-to-tr from-indigo-950 via-slate-900 to-cyan-950 opacity-30"></div>
+
+          <div class="relative z-10 flex items-center justify-between">
+            <span class="text-[10px] font-mono font-bold bg-cyan-400 text-slate-950 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span> 0:15
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">LOOP HD</span>
+          </div>
+
+          <div class="relative z-10 mx-auto my-auto">
+            <a href="tv-cinese.html"> 
+              <button class="w-11 h-11 rounded-full bg-white text-slate-950 flex items-center justify-center text-sm shadow-xl transition-transform group-hover:scale-110 cursor-pointer">
+                ▶
+              </button>
+            </a> 
+          </div>
+
+          <div class="relative z-10 text-[11px] font-bold text-white truncate text-center">
+            📺 tv-cinese.mp4
+          </div>
+        </div>
+  <!-- ==========================================
+             25. SMARTPHONE CARD DIALOGHI
+             ========================================== -->
+        <div data-category="media audio" data-title="smartphone chat dialoghi whatsapp messaggi conversazioni" class="bento-card col-span-1 sm:col-span-1 row-span-2 flex items-center justify-center p-2 min-h-[320px]">
+          <div class="smartphone-card">
+            <div class="phone-rim"></div>
+            <div class="phone-bezel">
+              <div class="phone-earpiece"></div>
+              <div class="phone-camera"></div>
+              
+              <div class="phone-screen" style="position: relative; overflow: hidden;">
+                <img
+                  src="img/chat.png"
+                  alt="Chat"
+                  onerror="this.src='https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=400&q=80'"
+                  style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; pointer-events: none;"
+                />
+
+                <div class="phone-status-bar" style="position: relative; z-index: 10;">
+                  <span class="phone-time font-mono">12:30</span>
+                  <div class="status-right">
+                    <div class="phone-wifi"></div>
+                    <div class="phone-battery"></div>
+                  </div>
+                </div>
+                
+                <div class="phone-screen-content" style="position: relative; z-index: 5;">
+                </div>
+                
+                <div class="charging-wave-ocean" style="z-index: 15;">
+                  <div class="liquid-wave wave-back"></div>
+                  <div class="liquid-wave wave-front"></div>
+                  <a href="whatsapp.html" class="charging-text z-20 block">
+                    <span class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 rounded-full text-white text-[10px] font-bold shadow-md cursor-pointer inline-block">
+                      💬 Apri Dialoghi
+                    </span>
+                  </a>
+                </div>
+                
+                <div class="phone-home-indicator" style="position: relative; z-index: 10;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+</div>
+</section>
+ <!-- ========================================================= -->
+      <!-- SEZIONE 6: Libri -->
+      <!-- ========================================================= -->
+      <section id="sezione-lezioni" class="space-y-3">
+        <div class="flex items-center justify-between border-b-2 border-slate-400 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-purple-500 rounded-full border border-slate-900"></span>
+            <h2 class="text-sm font-black font-mono uppercase tracking-wider text-slate-900">6. Libri e Norizie </h2>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-700">Libri-Audio, Pdf, Fiabe</span>
+        </div>
+<br>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <!-- ==========================================
+             22. BLOG GIORNALE VINTAGE
+             ========================================== -->
+      <!-- CARD NOTIZIE FLASH (Collegata a notizie-flash.json) -->
+<div data-category="studio media" data-title="notizie flash blog news curiosita articoli" class="bento-card group relative overflow-hidden col-span-1 sm:col-span-2 row-span-1 p-5 bg-amber-400 text-slate-950 border-3 border-slate-950 rounded-2xl shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] transition-all duration-200 flex items-center justify-between gap-4 min-h-[160px]">
+  
+  <!-- Sfondo Ideogramma Decorativo (快报 = Notizia Lampo) -->
+  <div class="absolute -right-1 -bottom-4 select-none pointer-events-none opacity-20 font-bold text-8xl text-slate-950 transform -rotate-12 group-hover:scale-110 group-hover:rotate-0 group-hover:opacity-30 transition-all duration-300 ease-out font-calligrafico">
+    快报
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- JAVASCRIPT: LOGICA COMPLETA (Zero server, 100% autonomo) -->
-  <!-- ========================================================================= -->
+  <!-- Contenuto Testuale Dinamico -->
+  <div class="relative z-10 flex flex-col justify-center max-w-[70%]">
+    <div class="flex items-center gap-2 mb-1.5">
+      <span id="newsTag" class="text-[10px] font-extrabold tracking-widest bg-slate-950 text-amber-400 px-2 py-0.5 rounded-md uppercase border border-slate-950 shadow-[1px_1px_0px_0px_rgba(255,255,255,0.4)] flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+        <span>快报 / FLASH NEWS</span>
+      </span>
+      <span id="newsDate" class="text-[9px] font-mono font-bold text-slate-800 bg-amber-300/80 px-1.5 py-0.5 rounded border border-amber-500/40">
+        Oggi
+      </span>
+    </div>
+
+    <h3 id="newsTitle" class="text-base sm:text-lg font-black text-slate-950 leading-tight tracking-tight line-clamp-1">
+      Caricamento notizie...
+    </h3>
+
+    <p id="newsDesc" class="text-xs font-bold text-slate-800 mt-1 leading-snug line-clamp-2">
+      Curiosità, approfondimenti culturali e aggiornamenti dal mondo cinese.
+    </p>
+
+    <!-- Controlli avanti/indietro se ci sono più notizie -->
+    <div class="flex items-center gap-2 mt-2">
+      <div class="flex items-center gap-1">
+        <button type="button" onclick="prevNews(event)" class="w-5 h-5 bg-slate-950 text-amber-400 hover:bg-slate-900 rounded text-[9px] font-black flex items-center justify-center cursor-pointer shadow-xs" title="Notizia precedente">
+          ◀
+        </button>
+        <span id="newsCounter" class="text-[9px] font-mono font-bold text-slate-900 px-1">
+          1/1
+        </span>
+        <button type="button" onclick="nextNews(event)" class="w-5 h-5 bg-slate-950 text-amber-400 hover:bg-slate-900 rounded text-[9px] font-black flex items-center justify-center cursor-pointer shadow-xs" title="Notizia successiva">
+          ▶
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Call to Action -->
+  <div class="relative z-10 flex-shrink-0">
+    <a id="newsLink" href="blog.html" class="inline-flex items-center justify-center px-4 py-2.5 bg-slate-950 hover:bg-slate-900 text-amber-400 font-black text-xs rounded-xl border-2 border-slate-950 shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all whitespace-nowrap gap-1.5 cursor-pointer">
+      Leggi <span class="text-sm">➔</span>
+    </a>
+  </div>
+</div>
+ <!-- ==========================================
+             27. CARD LIBRI DI FIABE & LEGGENDE TRADIZIONALI 🐉
+             ========================================== -->
+        <div data-category="studio audio" data-title="fiabe leggende storie miti racconti cinesi tradotti" class="bento-card col-span-1 sm:col-span-2 row-span-1 p-5 bg-amber-400 text-slate-950 border-3 border-slate-950 rounded-2xl shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center justify-between gap-4 min-h-[160px]">
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest bg-slate-950 text-amber-400 px-2 py-0.5 rounded">
+              童话 / FIABE CINESI
+            </span>
+            <h3 class="text-base font-black text-slate-950 mt-1 flex items-center gap-1.5">
+              Fiabe & Leggende Tradizionali 🏮
+            </h3>
+            <p class="text-xs font-bold text-slate-900">Miti, racconti popolari e storie illustrate per imparare leggendo.</p>
+          </div>
+          <a href="fiabe.html">
+            <button class="px-4 py-2 bg-slate-950 hover:bg-slate-900 text-white font-black text-xs rounded-xl border-2 border-slate-950 shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] whitespace-nowrap cursor-pointer">
+              Leggi ➔
+            </button>
+          </a>
+        </div>
+  <!-- ==========================================
+             21. LIBRI AUDIO RACCONTI CON EQUALIZZATORE
+             ========================================== -->
+        <div data-category="audio" data-title="libri audio racconti podcast ascolto musica cinese" class="bento-card col-span-1 sm:col-span-2 row-span-1 p-5 bg-gradient-to-r from-slate-900 via-slate-950 to-emerald-950 border-2 border-slate-900 rounded-3xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex items-center justify-between gap-4 min-h-[160px]">
+          <div class="flex items-center gap-3.5 overflow-hidden">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center text-xl font-black shadow-lg shadow-emerald-500/20 shrink-0">
+              🎵
+            </div>
+            <div class="min-w-0">
+              <div class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Libri audio
+              </div>
+              <div class="text-xs sm:text-sm font-black text-white truncate">Piccoli racconti con audio e traduzione</div>
+              <a href="libri/libriaudio.html" class="inline-block mt-1">
+                <button class="text-[11px] text-emerald-300 font-bold font-mono hover:underline cursor-pointer flex items-center gap-1">
+                  ▶ Ascolta Audiolibri
+                </button>
+              </a>
+            </div>
+          </div>
+
+          <!-- Barre Equalizzatore Audio -->
+          <div class="flex items-center gap-1 shrink-0">
+            <span class="w-1.5 h-3 bg-emerald-400 rounded-full animate-bounce"></span>
+            <span class="w-1.5 h-6 bg-emerald-500 rounded-full animate-pulse"></span>
+            <span class="w-1.5 h-8 bg-emerald-400 rounded-full animate-bounce"></span>
+            <span class="w-1.5 h-4 bg-emerald-500 rounded-full animate-pulse"></span>
+          </div>
+        </div>
+ <!-- ==========================================
+             7. CARD SMERALDO FOREST BIBLIOTECA
+             ========================================== -->
+        <div data-category="studio" data-title="biblioteca libri cinesi tradotti lettura" class="bento-card col-span-1 sm:col-span-1 row-span-1 p-5 bg-[#065f46] text-white border-2 border-slate-900 rounded-[2rem] shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between min-h-[160px] hover:-translate-y-1 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono font-black uppercase text-emerald-200 bg-emerald-800/80 px-2 py-0.5 rounded-full">
+              书店 · BIBLIOTECA
+            </span>
+            <a href="biblioteca.html">  
+              <button class="text-xs font-bold text-emerald-300 bg-emerald-900 hover:bg-emerald-950 px-2.5 py-1 rounded-md border border-emerald-700/50 cursor-pointer">
+                vai ↗
+              </button> 
+            </a>
+          </div>
+
+          <div class="my-1">
+            <div class="text-2xl sm:text-3xl font-black tracking-tight text-white">Biblioteca</div>
+            <p class="text-[11px] text-emerald-100 font-medium mt-0.5">Raccolta di libri cinesi tradotti</p>
+          </div>
+
+          <div class="w-full bg-emerald-800 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-emerald-300 h-full w-[94%] rounded-full"></div>
+          </div>
+        </div>
+    <!-- FRAME Pdf -->
+<div data-category="studio"  class="col-span-1 sm:col-span-1 row-span-2 bg-slate-950 border-2 border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col font-mono">
+  <div class="bg-slate-900 border-b border-slate-800 flex items-center gap-1 px-3 pt-2">
+    <div class="flex gap-1.5 mr-3">
+      <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+    </div>
+    <div class="bg-slate-950 text-cyan-400 text-xs px-3 py-1.5 rounded-t-lg border-t border-x border-slate-800 font-bold flex items-center gap-1.5">
+      <span>📚</span> Biblioteca.html
+    </div>
+   
+  </div>
+
+  <div class="flex-1 p-4 bg-slate-950 text-xs flex gap-3 overflow-x-auto">
+   <div class="relative rounded-[28px] border border-neutral-300 bg-white p-6 pt-12 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+      <!-- header quaderno -->
+      <div class="absolute inset-x-0 top-0 h-8 rounded-t-[28px] bg-[#dbeafe]"></div>
+
+      <!-- anelli -->
+      <div class="absolute left-10 top-0 h-6 w-4 -translate-y-1/2 rounded-full border-[3px] border-neutral-500 bg-neutral-100"></div>
+      <div class="absolute left-24 top-0 h-6 w-4 -translate-y-1/2 rounded-full border-[3px] border-neutral-500 bg-neutral-100"></div>
+      <div class="absolute left-38 top-0 h-6 w-4 -translate-y-1/2 rounded-full border-[3px] border-neutral-500 bg-neutral-100"></div>
+      <div class="absolute left-52 top-0 h-6 w-4 -translate-y-1/2 rounded-full border-[3px] border-neutral-500 bg-neutral-100"></div>
+
+      <div class="relative z-10">
+        <span class="mb-3 inline-block rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+          Raccolta PDF
+        </span>
+
+        <h2 class="mb-4 text-xl font-bold text-neutral-800">
+          Lettura e Caratteri
+        </h2>
+
+        <div class="space-y-3">
+          <a href="https://lingua-cinese.vercel.app/cinese-pdf.html" class="block rounded-xl bg-neutral-50 px-4 py-3 text-neutral-700 ring-1 ring-neutral-200 transition hover:-translate-y-0.5 hover:bg-sky-50 hover:text-neutral-900 hover:ring-sky-200">
+            Dispense e guide allo studio
+          </a>
+     
+        
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-indigo-950 px-3 py-1 text-[10px] text-indigo-300 flex items-center justify-between border-t border-indigo-800">
+    <span>图书馆</span>
+    <span>PDF 阅读器</span>
+  </div>
+</div>
+</div>
+</section>
+ <!-- ========================================================= -->
+      <!-- SEZIONE 7: Utility -->
+      <!-- ========================================================= -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b-2 border-slate-400 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-purple-500 rounded-full border border-slate-900"></span>
+            <h2 class="text-sm font-black font-mono uppercase tracking-wider text-slate-900">7. Utility e Giochi</h2>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-700">Traduttore-Giochi-Quaderno</span>
+        </div>
+<br>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <!-- ==========================================
+             11. CARD UTILITY (Cyberpunk style)
+             ========================================== -->
+        <div data-category="utility" data-title="utility traduttore correttore audio pinyin" class="bento-card col-span-1 sm:col-span-1 row-span-1 p-5 bg-[#0a192f] text-cyan-200 border-2 border-cyan-500/40 rounded-3xl shadow-xl flex flex-col justify-between font-mono min-h-[160px] hover:border-cyan-400 transition-all">
+          <div class="flex items-center justify-between text-[10px]">
+            <span class="text-cyan-400 font-bold">SEC-04 // SPEC</span>
+            <span class="text-cyan-500">45°27'N 9°11'E</span>
+          </div>
+
+          <div class="my-1">
+            <div class="text-xs font-bold text-white uppercase tracking-wider">Traduttore, Lettore audio</div>
+            <p class="text-[11px] text-cyan-300/80 mt-0.5">correttore esercizi & pinyin</p>
+          </div>
+
+          <div class="text-[10px] text-cyan-500 flex justify-between border-t border-cyan-900 pt-1">
+            <span>Utility</span>
+            <a href="utility.html" class="text-emerald-400 hover:underline font-bold">PASSED ✓ ➔</a>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             12. CARD PLAYGROUND INTERATTIVO
+             ========================================== -->
+        <div data-category="utility" data-title="playground codice commits streak studio" class="bento-card col-span-1 sm:col-span-2 row-span-1 p-5 bg-slate-950 text-white border-2 border-slate-800 rounded-3xl shadow-xl flex flex-col justify-between font-mono min-h-[160px]">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400 text-base">🐙</span>
+              <span class="text-xs font-bold text-white">Playground Studio</span>
+            </div>
+            <span class="text-[10px] text-emerald-400 font-bold">1,420 sessioni / anno</span>
+          </div>
+
+          <!-- Heatmap Interattiva -->
+          <div class="flex items-center gap-1 my-1 overflow-x-auto py-1 max-w-full">
+            <div class="grid grid-rows-3 grid-flow-col gap-1.5">
+              <span class="w-3.5 h-3.5 rounded-xs bg-slate-800 hover:scale-125 transition-transform" title="Giorno 1"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-900 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-500 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-700 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-slate-800 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-400 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-500 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-400 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-300 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-slate-800 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-600 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-500 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-400 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-300 hover:scale-125 transition-transform"></span>
+              <span class="w-3.5 h-3.5 rounded-xs bg-emerald-400 hover:scale-125 transition-transform"></span>
+            </div>
+          </div>
+
+          <div class="text-[10px] text-slate-400 flex justify-between">
+            <span class="text-emerald-400">🔥 Streak: 48 giorni</span>
+            <a href="playground.html" class="text-cyan-400 hover:underline">playground.html ➔</a>
+          </div>
+        </div>
+     <!-- ==========================================
+             23. CARD QUADERNO / NOTEBOOK
+             ========================================== -->
+        <div data-category="studio" data-title="quaderno appunti studio note confucio" class="bento-card relative col-span-1 sm:col-span-1 row-span-1 p-5 bg-[#fffbeb] text-slate-900 border-2 border-amber-900/40 rounded-2xl shadow-[4px_4px_0px_0px_rgba(120,53,15,0.8)] rotate-[-1.5deg] hover:rotate-0 transition-transform flex flex-col justify-between min-h-[160px] overflow-hidden">
+          <!-- Rilegatura a filo quaderno -->
+          <div class="absolute left-0 top-0 bottom-0 w-4 bg-amber-800/20 border-r border-dashed border-amber-800/40 flex flex-col justify-around items-center py-2 select-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-900/60 inline-block"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-900/60 inline-block"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-900/60 inline-block"></span>
+          </div>
+
+          <!-- Linee a righe quaderno -->
+          <div class="absolute inset-0 pl-5 opacity-20 pointer-events-none" style="background-image: linear-gradient(#b45309 1px, transparent 1px); background-size: 100% 20px;"></div>
+
+          <!-- Spilla 📌 in alto a destra -->
+          <div class="absolute -top-2.5 right-4 text-base select-none z-10">
+            📌
+          </div>
+
+          <div class="flex items-center justify-between pt-1 pl-2 relative z-10">
+            <span class="text-[9px] font-black uppercase tracking-wider text-amber-950 bg-amber-200/90 px-2 py-0.5 rounded border border-amber-300">
+              📖 笔记本 / NOTEBOOK
+            </span>
+            <span class="text-xs font-mono font-bold text-amber-800 mr-4">#02</span>
+          </div>
+
+          <div class="my-1 pl-2 relative z-10">
+            <p class="text-xs font-bold text-slate-800 font-sans leading-snug">
+              “学而不思则罔，思而不学则殆。”
+            </p>
+            <p class="text-[10px] text-amber-900/80 italic mt-0.5 font-sans">
+              Studiare senza riflettere è vano; riflettere senza studiare è pericoloso.
+            </p>
+          </div>
+
+          <div class="text-[10px] font-mono text-amber-900 font-bold flex justify-between border-t border-amber-300/80 pt-1 pl-2 relative z-10">
+            <span>Appunti Personali</span>
+            <a href="https://poliglotta-pdf.vercel.app/" class="hover:underline text-amber-900 font-bold">
+              ✓ Quaderno ➔
+            </a>
+          </div>
+        </div>
+</div>
+</section>
+ <!-- ========================================================= -->
+      <!-- SEZIONE frame:-->
+      <!-- ========================================================= -->
+      <section  class="space-y-3">
+        <div class="flex items-center justify-between border-b-2 border-slate-400 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-purple-500 rounded-full border border-slate-900"></span>
+            <h2 class="text-sm font-black font-mono uppercase tracking-wider text-slate-900">Aggiornamenti</h2>
+          </div>
+        
+        </div>
+<br>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- ==========================================
+             28. FRAME BROWSER DESKTOP 16:9 TIMELINE DISPLAY
+             ========================================== -->
+        <div data-category="media utility" data-title="timeline browser display percorso storico" class="bento-card col-span-1 sm:col-span-2 lg:col-span-4 row-span-4 bg-slate-900 border-2 border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[520px]">
+          <!-- Barra Superiore Browser -->
+          <div class="bg-slate-950 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg px-4 py-1 text-[11px] font-mono text-slate-400 flex items-center gap-2 max-w-xs w-full mx-4 truncate">
+              <span class="text-emerald-400">🔒</span>
+              <span class="text-slate-300 truncate">timeline-display.html</span>
+            </div>
+            <div class="text-slate-500 text-xs font-mono">⚡ 16:9</div>
+          </div>
+
+          <!-- Viewport Applicazione -->
+          <div class="flex-1 w-full p-2 sm:p-4 flex flex-col min-h-0 bg-slate-950/60">
+            <iframe src="timeline-display.html" class="w-full flex-1 min-h-[480px] rounded-xl shadow-lg border-0 bg-slate-900" title="Timeline Display" loading="lazy"></iframe>
+          </div>  
+        </div>
+
+      </div>
+</div>
+<section>
+ <!-- NESSUN RISULTATO TROVATO (Stato di Ricerca Vuoto) -->
+      <div id="noResultsState" class="hidden text-center py-12 bg-white/60 backdrop-blur-md rounded-3xl border-2 border-dashed border-amber-300 p-6">
+        <span class="text-4xl mb-2 block">🔍</span>
+        <h3 class="text-lg font-bold text-slate-900">Nessuna card trovata</h3>
+        <p class="text-xs text-slate-600 mt-1">Nessuna risorsa corrisponde ai termini cercati.</p>
+        <button onclick="clearSearch()" class="mt-3 px-4 py-1.5 bg-yellow-400 text-slate-950 font-bold text-xs rounded-xl shadow-sm cursor-pointer">
+          Azzera Ricerca
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL POPUP DIZIONARIO/VOCABOLARIO -->
+  <div id="modalIframe" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div id="modalContent">
+      <button id="modalCloseBtn" onclick="closeModal()" aria-label="Chiudi finestra">&times;</button>
+      <div class="bg-slate-950 text-white px-4 py-2 flex items-center justify-between border-b border-slate-800 text-xs font-mono">
+        <span id="modalTitle" class="flex items-center gap-2 font-bold text-amber-400">
+          <span>📖</span> Vocabolario Interattivo Cinese
+        </span>
+        <span class="text-slate-400 text-[10px]">Vocabolario-Cinese</span>
+      </div>
+      <iframe src="https://scottino2019-glitch.github.io/Vocabolario-Cinese/" title="Vocabolario Cinese" class="w-full h-full"></iframe>
+    </div>
+  </div>
+
+  <!-- FOOTER PRINCIPALE -->
+  <footer class="mt-16 sm:mt-20 bg-[#0c1220] text-slate-400 border-t-4 border-yellow-500 py-12 px-4 sm:px-6 w-full relative z-20">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <div>
+        <div class="flex items-center gap-2 text-white font-titolo text-xl font-bold mb-2">
+          <span class="text-yellow-400 font-calligrafico text-2xl">中</span> Lingua Cinese
+        </div>
+        <p class="text-xs text-slate-400 max-w-sm leading-relaxed">
+          Il tuo hub dinamico per l'apprendimento della lingua e della cultura cinese mandarino. Struttura modulare autonoma HTML.
+        </p>
+      </div>
+
+      <!-- Social & Canali Telegram / WhatsApp -->
+      <div class="flex flex-wrap gap-3 justify-center">
+        <a href="https://t.me/linguacinese_gruppo" class="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-all text-xs text-slate-200" target="_blank" rel="noopener">
+          <span>🇨🇳</span>
+          <span class="font-semibold">Gruppo Telegram</span>
+        </a>
+        <a href="https://t.me/linguacinese2000" class="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-all text-xs text-slate-200" target="_blank" rel="noopener">
+          <span>🀄</span>
+          <span class="font-semibold">Canale Ufficiale</span>
+        </a>
+        <a href="https://whatsapp.com/channel/0029Vb9pEfZADTO7QH1Cyq2h" class="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-all text-xs text-slate-200" target="_blank" rel="noopener">
+          <span>🌍</span>
+          <span class="font-semibold">Canale WhatsApp</span>
+        </a>
+        <a href="scrittura/scrivolingo.html" class="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-all text-xs text-slate-200" target="_blank" rel="noopener">
+          <span>🐼</span>
+          <span class="font-semibold">App Scrittura</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500 text-xs max-w-7xl mx-auto font-mono">
+      <div>© 2026 Lingua Cinese · Tutti i diritti riservati</div>
+      <div class="flex items-center gap-4">
+        <a href="contatti.html" class="hover:text-yellow-400 transition-colors">Contatti</a>
+        <span>·</span>
+        <a href="biblioteca.html" class="hover:text-yellow-400 transition-colors">Biblioteca</a>
+        <span>·</span>
+        <a href="grammatica.html" class="hover:text-yellow-400 transition-colors">Grammatica</a>
+      </div>
+    </div>
+  </footer>
+<div id="roji-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 2147483647; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: auto;">
+  <iframe 
+    id="roji-iframe"
+    src="https://roji-tawny.vercel.app/" 
+    style="width: 100%; height: 100%; border: none; overflow: hidden; background: transparent;"
+    scrolling="auto"
+    allowtransparency="true">
+  </iframe>
+</div>
+
+
+
   <script>
-    // Libri di base incorporati (Garantisce che funzioni anche offline o con doppio click su index.html)
-    const DEFAULT_BOOKS = [
+    document.addEventListener('DOMContentLoaded', () => {
+          /* ==========================================================================
+       1. SISTEMA FLASHCARD INTERATTIVO 3D
+       ========================================================================== */
+    const flashcardsData = [
       {
-        id: "guida-libreria",
-        title: "Guida alla Tua Biblioteca",
-        author: "Amministrazione Sito",
-        originalYear: 2026,
-        genre: "Filosofia",
-        coverColor: "#78350f",
-        coverPattern: "vintage-gold",
-        accentColor: "#f7d070",
-        pagesCount: 12,
-        readingTime: "5 min",
-        rating: 5.0,
-        tags: ["Guida", "Tutorial", "HTML"],
-        description: "Istruzioni chiare su come inserire i tuoi file HTML nella cartella books/ e personalizzare la homepage per tutti gli utenti del sito.",
-        htmlPath: "books/guida-libreria.html",
-        chapters: []
+        hanzi: "你好",
+        pinyin: "nǐ hǎo",
+        meaning: "Ciao / Salve",
+        example: "你好，很高兴认识你！",
+        exampleIt: "Ciao, piacere di conoscerti!",
+        category: "HSK 1",
+        strokes: 13
       },
       {
-        id: "piccolo-principe",
-        title: "Il Piccolo Principe",
-        author: "Antoine de Saint-Exupéry",
-        originalYear: 1943,
-        genre: "Fiabe & Favole",
-        coverColor: "#1e293b",
-        coverPattern: "celestial",
-        accentColor: "#f7d070",
-        pagesCount: 96,
-        readingTime: "25 min",
-        rating: 4.9,
-        tags: ["Classico", "Illustrato", "Poesia"],
-        description: "Il viaggio poetico di un principe venuto da un lontano asteroide che impara i segreti dell'amicizia e dell'invisibile agli occhi.",
-        htmlPath: "books/il-piccolo-principe.html",
-        chapters: []
+        hanzi: "谢谢",
+        pinyin: "xiè xie",
+        meaning: "Grazie",
+        example: "太谢谢你的帮助了！",
+        exampleIt: "Molte grazie per il tuo aiuto!",
+        category: "HSK 1",
+        strokes: 24
       },
       {
-        id: "viaggio-centro-terra",
-        title: "Viaggio al Centro della Terra",
-        author: "Jules Verne",
-        originalYear: 1864,
-        genre: "Avventura",
-        coverColor: "#065f46",
-        coverPattern: "steampunk",
-        accentColor: "#34d399",
-        pagesCount: 240,
-        readingTime: "45 min",
-        rating: 4.8,
-        tags: ["Avventura", "Scienza", "Mistero"],
-        description: "La straordinaria spedizione del professor Lidenbrock attraverso i cunicoli del vulcano islandese Sneffels fino alle viscere del pianeta.",
-        htmlPath: "books/viaggio-al-centro-della-terra.html",
-        chapters: []
+        hanzi: "学习",
+        pinyin: "xué xí",
+        meaning: "Studiare / Imparare",
+        example: "我每天学习中文。",
+        exampleIt: "Studio cinese ogni giorno.",
+        category: "HSK 2",
+        strokes: 11
       },
       {
-        id: "il-mio-primo-libro",
-        title: "Il Mio Libro Personalizzato",
-        author: "Il Tuo Nome",
-        originalYear: 2026,
-        genre: "I Miei Libri",
-        coverColor: "#7f1d1d",
-        coverPattern: "botanical",
-        accentColor: "#f59e0b",
-        pagesCount: 30,
-        readingTime: "10 min",
-        rating: 5.0,
-        tags: ["Bozza", "Personale", "Interattivo"],
-        description: "Un esempio di file HTML che puoi modificare o sostituire con i tuoi testi e racconti direttamente nella cartella dell'app.",
-        htmlPath: "books/il-mio-primo-libro.html",
-        chapters: []
+        hanzi: "朋友",
+        pinyin: "péng you",
+        meaning: "Amico / Amica",
+        example: "他们都是我的好朋友。",
+        exampleIt: "Loro sono tutti miei cari amici.",
+        category: "HSK 1",
+        strokes: 12
       },
       {
-        id: "cappuccetto-rosso",
-        title: "Cappuccetto Rosso",
-        author: "Fratelli Grimm",
-        originalYear: 2026,
-        genre: "Fiabe & Favole",
-        coverColor: "#881337",
-        coverPattern: "botanical",
-        accentColor: "#fecdd3",
-        pagesCount: 5,
-        readingTime: "10 min",
-        rating: 5.0,
-        tags: ["Fiabe", "Grimm", "Classico", "Audio"],
-        description: "La celebre fiaba della bambina dal mantello rosso, del lupo nel bosco e della casa della nonna.",
-        htmlPath: "books/cappuccetto_rosso.html",
-        chapters: []
+        hanzi: "梦想",
+        pinyin: "mèng xiǎng",
+        meaning: "Sogno / Aspirazione",
+        example: "勇敢追求你的梦想。",
+        exampleIt: "Insegui coraggiosamente il tuo sogno.",
+        category: "HSK 3",
+        strokes: 22
+      },
+      {
+        hanzi: "咖啡",
+        pinyin: "kā fēi",
+        meaning: "Caffè",
+        example: "你想喝一杯咖啡吗？",
+        exampleIt: "Vuoi bere una tazza di caffè?",
+        category: "HSK 2",
+        strokes: 16
+      },
+      {
+        hanzi: "中国",
+        pinyin: "zhōng guó",
+        meaning: "Cina",
+        example: "我想去中国旅游。",
+        exampleIt: "Vorrei viaggiare in Cina.",
+        category: "HSK 1",
+        strokes: 12
+      },
+      {
+        hanzi: "加油",
+        pinyin: "jiā yóu",
+        meaning: "Forza! / Coraggio!",
+        example: "考试加油，你一定可以！",
+        exampleIt: "Forza per l'esame, ce la farai!",
+        category: "HSK 2",
+        strokes: 13
+      },
+      {
+        hanzi: "快乐",
+        pinyin: "kuài lè",
+        meaning: "Felice / Gioioso",
+        example: "祝你生日快乐！",
+        exampleIt: "Ti auguro buon compleanno!",
+        category: "HSK 1",
+        strokes: 12
+      },
+      {
+        hanzi: "再见",
+        pinyin: "zài jiàn",
+        meaning: "Arrivederci / A presto",
+        example: "明天见，再见！",
+        exampleIt: "A domani, arrivederci!",
+        category: "HSK 1",
+        strokes: 10
       }
     ];
 
-    // Funzione helper per sanificare percorsi e oggetti libro
-    function normalizeBookList(list) {
-      if (!Array.isArray(list)) return [];
-      return list.map(b => {
-        let cleanPath = b.htmlPath || '';
-        if (cleanPath.startsWith('/')) cleanPath = cleanPath.slice(1);
-        return {
-          ...b,
-          id: b.id || b.title.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-          htmlPath: cleanPath
-        };
-      });
+    let currentCardIndex = 0;
+    let isCardFlipped = false;
+
+    function renderFlashcard() {
+      const card = flashcardsData[currentCardIndex];
+      document.getElementById('fcHanzi').textContent = card.hanzi;
+      document.getElementById('fcPinyin').textContent = card.pinyin;
+      document.getElementById('fcMeaning').textContent = card.meaning;
+      document.getElementById('fcCategory').textContent = card.category;
+      document.getElementById('fcIndex').textContent = `${currentCardIndex + 1} / ${flashcardsData.length}`;
+      document.getElementById('fcStrokes').textContent = `Tratti: ${card.strokes}`;
+      document.getElementById('fcExample').innerHTML = `“${card.example}”<br><span class="text-cyan-300 text-[9px]">${card.exampleIt}</span>`;
+      
+      // Reset flip se si cambia carta
+      const el = document.getElementById('interactiveFlashcard');
+      if (el && isCardFlipped) {
+        el.classList.remove('is-flipped');
+        isCardFlipped = false;
+      }
     }
 
-    // Stato Applicazione
-    let allBooks = [];
-    let currentView = 'shelf'; // 'shelf' | 'grid' | 'bookmarks'
-    let selectedGenre = 'ALL';
-    let searchQuery = '';
-    let sortMode = 'featured';
-    let bookmarks = JSON.parse(localStorage.getItem('lib_bookmarks') || '[]');
-    let currentReadingBook = null;
-    let currentChapterIndex = 0;
+    function toggleFlashcardFlip() {
+      const el = document.getElementById('interactiveFlashcard');
+      if (el) {
+        isCardFlipped = !isCardFlipped;
+        el.classList.toggle('is-flipped', isCardFlipped);
+      }
+    }
 
-    // Inizializzazione al caricamento
-    document.addEventListener('DOMContentLoaded', async () => {
-      await loadBooksCatalog();
-      renderGenreFilters();
-      renderApp();
-      lucide.createIcons();
-    });
+    function nextFlashcard() {
+      currentCardIndex = (currentCardIndex + 1) % flashcardsData.length;
+      renderFlashcard();
+    }
 
-    // Carica il catalogo (da catalog.json o catalog.js con fallback)
-    async function loadBooksCatalog() {
-      let loaded = false;
+    function prevFlashcard() {
+      currentCardIndex = (currentCardIndex - 1 + flashcardsData.length) % flashcardsData.length;
+      renderFlashcard();
+    }
 
-      // 1. Prova a caricare via fetch (server HTTP / GitHub Pages / Netlify / Vercel)
-      const candidates = ['./books/catalog.json', 'books/catalog.json', '/books/catalog.json'];
-      for (const path of candidates) {
-        try {
-          const res = await fetch(path);
-          if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data) && data.length > 0) {
-              allBooks = normalizeBookList(data);
-              loaded = true;
-              console.log('Catalogo caricato via fetch da:', path);
-              break;
-            }
-          }
-        } catch (e) {
-          // Ignora errori di fetch (es. CORS su file://)
+    function randomFlashcard() {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * flashcardsData.length);
+      } while (randomIndex === currentCardIndex && flashcardsData.length > 1);
+      currentCardIndex = randomIndex;
+      renderFlashcard();
+    }
+
+    function speakFlashcard() {
+      const card = flashcardsData[currentCardIndex];
+      speakText(card.hanzi);
+    }
+
+    /* ==========================================================================
+       0. CARICAMENTO FRASE DEL GIORNO DA JSON (sticker-frase.json)
+       ========================================================================== */
+    let currentQuoteData = {
+      title: "frase del giorno",
+      hanzi: "千里之行，始于足下.",
+      pinyin: "Qiān lǐ zhī xíng, shǐ yú zú xià.",
+      translation: "Un viaggio di mille miglia comincia con un solo passo.",
+      author: "Laozi · 老子"
+    };
+
+    // Dizionario contestuale di traduzioni e autori per le citazioni cinesi
+    const quoteTranslations = {
+      "千里之行，始于足下.": {
+        translation: "Un viaggio di mille miglia comincia con un solo passo.",
+        author: "Laozi · 老子"
+      },
+      "千里之行，始于足下": {
+        translation: "Un viaggio di mille miglia comincia con un solo passo.",
+        author: "Laozi · 老子"
+      },
+      "温故而知新": {
+        translation: "Rivedere il vecchio per comprendere il nuovo.",
+        author: "Confucio · 論語"
+      },
+      "学而不思则罔，思而不学则殆。": {
+        translation: "Studiare senza riflettere è vano; riflettere senza studiare è pericoloso.",
+        author: "Confucio · 孔子"
+      },
+      "读书百遍，其义自见。": {
+        translation: "Leggi un libro cento volte e il suo significato apparirà spontaneamente.",
+        author: "Proverbio Cinese"
+      }
+    };
+
+    async function loadQuoteSticker() {
+      try {
+        const res = await fetch('./sticker-frase.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('File sticker-frase.json non raggiungibile via fetch');
+        const data = await res.json();
+        const item = Array.isArray(data) ? data[0] : data;
+        
+        if (item && item.hanzi) {
+          currentQuoteData.title = item.title || "Frase del giorno";
+          currentQuoteData.hanzi = item.hanzi;
+          currentQuoteData.pinyin = item.pinyin || "";
+          
+          const rawHanzi = item.hanzi.trim();
+          const cleanHanzi = rawHanzi.replace(/[.。!！]/g, '');
+          const mapped = quoteTranslations[rawHanzi] || quoteTranslations[cleanHanzi];
+          
+          currentQuoteData.translation = item.translation || item.traduzione || item.meaning || (mapped ? mapped.translation : "Massima e proverbio tradizionale cinese.");
+          currentQuoteData.author = item.author || item.autore || (mapped ? mapped.author : "Proverbio Cinese");
         }
-      }
-
-      // 2. Se fetch non è disponibile (es. doppio clic su file:/// index.html), usa catalog.js o i default
-      if (!loaded) {
-        if (window.BOOKS_CATALOG && Array.isArray(window.BOOKS_CATALOG) && window.BOOKS_CATALOG.length > 0) {
-          allBooks = normalizeBookList(window.BOOKS_CATALOG);
-          console.log('Catalogo caricato da books/catalog.js');
-        } else {
-          allBooks = normalizeBookList(DEFAULT_BOOKS);
-          console.log('Catalogo inizializzato con dati di default');
-        }
+      } catch (err) {
+        console.info('Utilizzo frase predefinita o locale:', err.message);
+      } finally {
+        updateQuoteUI();
       }
     }
 
-    // Filtra e ordina i libri
-    function getFilteredBooks() {
-      let result = [...allBooks];
+    function updateQuoteUI() {
+      const labelEl = document.getElementById('quoteLabel');
+      const hanziEl = document.getElementById('quoteHanzi');
+      const pinyinEl = document.getElementById('quotePinyin');
+      const transEl = document.getElementById('quoteTranslation');
+      const authorEl = document.getElementById('quoteAuthor');
 
-      // Filtro Segnalibri
-      if (currentView === 'bookmarks') {
-        result = result.filter(b => bookmarks.includes(b.id));
-      }
-
-      // Filtro Genere
-      if (selectedGenre !== 'ALL') {
-        result = result.filter(b => b.genre === selectedGenre);
-      }
-
-      // Filtro Ricerca
-      if (searchQuery.trim() !== '') {
-        const q = searchQuery.toLowerCase();
-        result = result.filter(b => 
-          b.title.toLowerCase().includes(q) ||
-          b.author.toLowerCase().includes(q) ||
-          (b.genre && b.genre.toLowerCase().includes(q)) ||
-          (b.tags && b.tags.some(t => t.toLowerCase().includes(q)))
-        );
-      }
-
-      // Ordinamento
-      if (sortMode === 'title') {
-        result.sort((a, b) => a.title.localeCompare(b.title));
-      } else if (sortMode === 'rating') {
-        result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-      } else if (sortMode === 'year') {
-        result.sort((a, b) => (b.originalYear || 0) - (a.originalYear || 0));
-      }
-
-      return result;
+      if (labelEl) labelEl.textContent = currentQuoteData.title || "Frase del giorno";
+      if (hanziEl) hanziEl.textContent = currentQuoteData.hanzi;
+      if (pinyinEl) pinyinEl.textContent = currentQuoteData.pinyin;
+      if (transEl) transEl.textContent = currentQuoteData.translation;
+      if (authorEl) authorEl.textContent = currentQuoteData.author;
     }
 
-    // Renderizza i filtri genere
-    function renderGenreFilters() {
-      const genres = ['ALL', ...new Set(allBooks.map(b => b.genre).filter(Boolean))];
-      const container = document.getElementById('genreFilters');
-      container.innerHTML = genres.map(g => {
-        const isSelected = selectedGenre === g;
-        const label = g === 'ALL' ? 'Tutti i Libri' : g;
-        return `
-          <button onclick="filterGenre('${g}')" class="px-3 py-1 rounded-full text-xs font-medium transition cursor-pointer whitespace-nowrap ${
-            isSelected 
-              ? 'bg-amber-600 text-stone-950 font-bold shadow' 
-              : 'bg-stone-900/90 text-stone-400 hover:text-amber-200 border border-stone-800'
-          }">
-            ${label}
-          </button>
-        `;
-      }).join('');
+    function speakQuote() {
+      if (currentQuoteData && currentQuoteData.hanzi) {
+        speakText(currentQuoteData.hanzi);
+      }
     }
 
-    // Render Generale
-    function renderApp() {
-      const books = getFilteredBooks();
-      const countEl = document.getElementById('bookCountText');
-      countEl.textContent = `${books.length} ${books.length === 1 ? 'libro trovato' : 'libri disponibili'}`;
+    /* ==========================================================================
+       2. SINTESI VOCALE PRONUNCIA CINESE (Web Speech API)
+       ========================================================================== */
+    let activeSpeechUtterance = null;
 
-      const emptyEl = document.getElementById('emptyState');
-      const shelfContainer = document.getElementById('shelfViewContainer');
-      const gridContainer = document.getElementById('gridViewContainer');
-
-      if (books.length === 0) {
-        emptyEl.classList.remove('hidden');
-        shelfContainer.classList.add('hidden');
-        gridContainer.classList.add('hidden');
+    function speakText(text) {
+      if (!text) return;
+      if (!('speechSynthesis' in window)) {
+        alert("La sintesi vocale non è supportata da questo browser.");
         return;
       }
 
-      emptyEl.classList.add('hidden');
-
-      if (currentView === 'shelf') {
-        shelfContainer.classList.remove('hidden');
-        gridContainer.classList.add('hidden');
-        renderShelves(books);
-      } else {
-        shelfContainer.classList.add('hidden');
-        gridContainer.classList.remove('hidden');
-        renderGrid(books);
-      }
-
-      lucide.createIcons();
-    }
-
-    // Renderizza gli scaffali 3D (4 libri per ripiano)
-    function renderShelves(books) {
-      const container = document.getElementById('shelfViewContainer');
-      const chunkSize = 4;
-      const shelfChunks = [];
-      for (let i = 0; i < books.length; i += chunkSize) {
-        shelfChunks.push(books.slice(i, i + chunkSize));
-      }
-
-      const shelfLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
-
-      container.innerHTML = shelfChunks.map((chunk, index) => {
-        const letter = shelfLetters[index % shelfLetters.length];
-        const shelfNumber = index + 1;
-
-        return `
-          <div class="relative pt-4 pb-2">
-            <!-- Scaffale Backdrop & Libri -->
-            <div class="shelf-backdrop rounded-2xl p-6 sm:p-8 border border-stone-800/80 shadow-2xl relative">
-              
-              <!-- Luce Superiore Scaffale -->
-              <div class="absolute inset-x-8 top-0 h-1 bg-gradient-to-r from-transparent via-amber-400/20 to-transparent"></div>
-
-              <!-- Libri appoggiati sul ripiano -->
-              <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 items-end relative z-10 min-h-[280px]">
-                ${chunk.map(book => createBook3DCard(book)).join('')}
-              </div>
-
-              <!-- Il Ripiano in Legno massiccio -->
-              <div class="wood-shelf h-7 w-full rounded-md mt-4 relative flex items-center justify-center">
-                <!-- Targa in Ottone Incisa -->
-                <div class="brass-plate px-4 py-0.5 rounded text-[10px] font-rocksalt font-black tracking-widest uppercase border border-amber-800/40">
-                  SCAFFALE ${letter} • VOL. ${shelfNumber}
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // Genera il markup della copertina 3D del singolo libro
-    function createBook3DCard(book) {
-      const isBookmarked = bookmarks.includes(book.id);
-      const bgCol = book.coverColor || '#1e293b';
-      const accentCol = book.accentColor || '#f7d070';
-      const patternSvg = getPatternSvg(book.coverPattern, accentCol);
-
-      return `
-        <div class="book-card cursor-pointer group flex flex-col items-center" onclick="openReader('${book.id}')">
-          <!-- Copertina Rigida con Spessore e Fregi -->
-          <div class="book-cover relative w-full aspect-[2/3] max-w-[190px] rounded-r-xl rounded-l-sm p-4 flex flex-col justify-between overflow-hidden" 
-               style="background-color: ${bgCol}; border-right: 3px solid rgba(0,0,0,0.5);">
-            
-            <!-- Dorsale Libro -->
-            <div class="book-spine-effect"></div>
-
-            <!-- Fregio Angolare / Pattern -->
-            <div class="absolute inset-2 border border-dashed rounded-r-lg opacity-40 pointer-events-none" style="border-color: ${accentCol};"></div>
-            <div class="absolute right-3 top-3 opacity-30 pointer-events-none">${patternSvg}</div>
-
-            <!-- Header Copertina -->
-            <div class="relative z-10 pl-2">
-              <span class="text-[9px] uppercase tracking-widest font-mono block opacity-80" style="color: ${accentCol};">
-                ${book.genre || 'Racconto'}
-              </span>
-            </div>
-
-            <!-- Centro Titolo -->
-            <div class="relative z-10 text-center pl-2 my-auto">
-              <h4 class="font-gloria text-sm sm:text-base font-bold leading-snug line-clamp-3 text-amber-100 drop-shadow-md">
-                ${book.title}
-              </h4>
-              <p class="font-garamond italic text-xs mt-1 opacity-90 line-clamp-1" style="color: ${accentCol};">
-                ${book.author}
-              </p>
-            </div>
-
-            <!-- Footer Copertina con Anno & Valutazione -->
-            <div class="relative z-10 pl-2 flex items-center justify-between text-[10px] font-mono opacity-80" style="color: ${accentCol};">
-              <span>${book.originalYear || '2026'}</span>
-              <div class="flex items-center gap-0.5">
-                <i data-lucide="star" class="w-3 h-3 fill-current"></i>
-                <span>${book.rating || '5.0'}</span>
-              </div>
-            </div>
-
-            <!-- Segnalibro Pendente (se salvato) -->
-            ${isBookmarked ? `
-              <div class="absolute top-0 right-3 w-4 h-8 bg-red-600 shadow-md rounded-b-sm border-b-2 border-red-800 flex items-end justify-center pb-1">
-                <div class="w-1.5 h-1.5 rounded-full bg-amber-300"></div>
-              </div>
-            ` : ''}
-          </div>
-
-          <!-- Didascalia sotto il libro -->
-          <div class="mt-2.5 text-center w-full max-w-[190px]">
-            <p class="text-xs font-medium text-stone-300 truncate group-hover:text-amber-300 transition">${book.title}</p>
-            <p class="text-[11px] text-stone-500 truncate">${book.author}</p>
-          </div>
-        </div>
-      `;
-    }
-
-    // Renderizza Vista Griglia
-    function renderGrid(books) {
-      const container = document.getElementById('gridViewContainer');
-      container.innerHTML = books.map(book => {
-        const isBookmarked = bookmarks.includes(book.id);
-        return `
-          <div class="bg-[#181512] border border-stone-800 hover:border-amber-700/50 rounded-2xl p-5 shadow-xl transition flex flex-col justify-between group">
-            <div class="flex items-start gap-4">
-              <div class="w-20 aspect-[2/3] rounded-r-md rounded-l-xs shrink-0 shadow-md p-2 flex flex-col justify-between" style="background-color: ${book.coverColor || '#1e293b'};">
-                <span class="text-[8px] uppercase tracking-wider text-amber-300 font-mono">${book.originalYear || '2026'}</span>
-                <p class="font-gloria text-[10px] font-bold text-amber-100 leading-tight line-clamp-2">${book.title}</p>
-                <span class="text-[8px] text-amber-400 font-mono">★ ${book.rating || '5.0'}</span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <span class="text-[10px] font-mono uppercase tracking-wider text-amber-500">${book.genre || 'Generale'}</span>
-                <h4 class="font-gloria text-base font-bold text-amber-100 truncate group-hover:text-amber-300 transition">${book.title}</h4>
-                <p class="text-xs text-stone-400 mb-2">${book.author}</p>
-                <p class="text-xs text-stone-500 line-clamp-2 leading-relaxed">${book.description || 'Nessuna descrizione disponibile.'}</p>
-              </div>
-            </div>
-
-            <div class="mt-4 pt-3 border-t border-stone-800/80 flex items-center justify-between">
-              <button onclick="toggleBookmark('${book.id}', event)" class="text-xs text-stone-400 hover:text-amber-300 flex items-center gap-1">
-                <i data-lucide="bookmark" class="w-3.5 h-3.5 ${isBookmarked ? 'fill-amber-500 text-amber-500' : ''}"></i>
-                <span>${isBookmarked ? 'Salvato' : 'Segnalibro'}</span>
-              </button>
-              <button onclick="openReader('${book.id}')" class="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold text-xs flex items-center gap-1 shadow">
-                <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
-                <span>Leggi</span>
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // Pattern decorativi SVG per copertine
-    function getPatternSvg(pattern, color) {
-      if (pattern === 'celestial') {
-        return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="3"/></svg>`;
-      }
-      if (pattern === 'steampunk') {
-        return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
-      }
-      if (pattern === 'botanical') {
-        return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.5"><path d="M12 2L9.5 8.5 3 11l6.5 2.5L12 20l2.5-6.5L21 11l-6.5-2.5z"/></svg>`;
-      }
-      return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`;
-    }
-
-    // =========================================================================
-    // GESTIONE LETTORE
-    // =========================================================================
-    function openReader(bookId) {
-      const book = allBooks.find(b => String(b.id) === String(bookId));
-      if (!book) return;
-
-      currentReadingBook = book;
-      currentChapterIndex = 0;
-
-      document.getElementById('readerBookTitle').textContent = book.title;
-      document.getElementById('readerBookAuthor').textContent = `${book.author} • ${book.genre || 'Lettura'}`;
-
-      // Aggiorna link esterno
-      const extLink = document.getElementById('readerExternalLink');
-      if (book.htmlPath) {
-        extLink.href = resolveBookPath(book.htmlPath);
-        extLink.classList.remove('hidden');
-      } else {
-        extLink.classList.add('hidden');
-      }
-
-      updateReaderBookmarkStatus();
-
-      // Controllo Multi-Capitolo
-      const hasChapters = book.chapters && book.chapters.length > 0;
-      const chapterContainer = document.getElementById('chapterSelectContainer');
-      const chapterFooter = document.getElementById('chapterNavFooter');
-
-      if (hasChapters) {
-        chapterContainer.classList.remove('hidden');
-        chapterFooter.classList.remove('hidden');
+      try {
+        window.speechSynthesis.cancel();
         
-        // Popola dropdown capitoli
-        const dropdown = document.getElementById('chapterDropdown');
-        dropdown.innerHTML = book.chapters.map((ch, idx) => `
-          <option value="${idx}">Cap. ${ch.number || idx + 1}: ${ch.title}</option>
-        `).join('');
+        setTimeout(() => {
+          const cleanText = text.replace(/[。，！？,!?.]/g, ' ');
+          const utterance = new SpeechSynthesisUtterance(cleanText.trim() || text);
+          utterance.lang = 'zh-CN';
+          utterance.rate = 0.85;
+          utterance.pitch = 1.0;
 
-        loadChapter(0);
+          // Seleziona la voce cinese nativa se disponibile nel sistema
+          const voices = window.speechSynthesis.getVoices();
+          const zhVoice = voices.find(v => v.lang.startsWith('zh') || v.lang.includes('cmn') || v.lang.toLowerCase().includes('chinese'));
+          if (zhVoice) {
+            utterance.voice = zhVoice;
+          }
+
+          activeSpeechUtterance = utterance; // Evita garbage collection in Chromium/Safari
+          window.speechSynthesis.speak(utterance);
+        }, 40);
+      } catch (err) {
+        console.warn("Errore sintesi vocale:", err);
+      }
+    }
+
+    // Pre-inizializzazione voci browser
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+
+    /* ==========================================================================
+       3. FILTRO CATEGORIE & RICERCA CARD INTERATTIVA
+       ========================================================================== */
+    let currentCategory = 'all';
+
+    function filterCategory(category, btnElement) {
+      currentCategory = category;
+
+      // Aggiorna stile bottoni categoria
+      const buttons = document.querySelectorAll('.cat-btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-yellow-400', 'text-slate-950', 'shadow-md', 'active');
+        btn.classList.add('text-slate-300', 'hover:bg-slate-800');
+      });
+
+      if (btnElement) {
+        btnElement.classList.add('bg-yellow-400', 'text-slate-950', 'shadow-md', 'active');
+        btnElement.classList.remove('text-slate-300', 'hover:bg-slate-800');
+      }
+
+      // Aggiorna banner info
+      const infoBanner = document.getElementById('categoryActiveInfo');
+      const labelText = document.getElementById('categoryLabelText');
+      if (category === 'all') {
+        infoBanner.classList.add('hidden');
+        infoBanner.classList.remove('flex');
       } else {
-        chapterContainer.classList.add('hidden');
-        chapterFooter.classList.add('hidden');
-
-        // Carica libro volume singolo
-        const iframe = document.getElementById('readerIframe');
-        const textContainer = document.getElementById('readerTextContainer');
-
-        if (book.htmlPath) {
-          iframe.classList.remove('hidden');
-          textContainer.classList.add('hidden');
-          iframe.src = resolveBookPath(book.htmlPath);
-        } else {
-          iframe.classList.add('hidden');
-          textContainer.classList.remove('hidden');
-          document.getElementById('readerTextContent').innerHTML = book.rawHtmlContent || '<p>Nessun contenuto disponibile.</p>';
-        }
+        infoBanner.classList.remove('hidden');
+        infoBanner.classList.add('flex');
+        const names = {
+          'studio': '📚 Grammatica & Studio',
+          'flashcard': '🎴 Flashcard & Caratteri',
+          'media': '🎬 Video & Frame',
+          'audio': '🎧 Audio & Racconti',
+          'utility': '🛠️ Strumenti & Utility'
+        };
+        labelText.textContent = `Categoria attiva: ${names[category] || category}`;
       }
 
-      document.getElementById('readerProgressBar').style.width = '10%';
-      document.getElementById('readerModal').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-      lucide.createIcons();
+      applyFilters();
     }
 
-    function resolveBookPath(path) {
-      if (!path) return 'about:blank';
-      if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:')) {
-        return path;
-      }
-      // Rimuovi barra iniziale per compatibilità assoluta con percorsi relativi
-      const clean = path.startsWith('/') ? path.slice(1) : path;
-      return clean;
-    }
-
-    function loadChapter(index) {
-      if (!currentReadingBook || !currentReadingBook.chapters) return;
-      currentChapterIndex = index;
-      const chapter = currentReadingBook.chapters[index];
-      const total = currentReadingBook.chapters.length;
-
-      document.getElementById('chapterDropdown').value = index;
-      document.getElementById('chapterStatusLabel').textContent = `Capitolo ${index + 1} di ${total}`;
-      
-      document.getElementById('prevChapterBtn').disabled = (index === 0);
-      const nextBtn = document.getElementById('nextChapterBtn');
-      if (index === total - 1) {
-        nextBtn.innerHTML = `<span>🎉 Concludi Libro</span>`;
-      } else {
-        nextBtn.innerHTML = `<span>Capitolo Successivo</span> <i data-lucide="chevron-right" class="w-4 h-4"></i>`;
-      }
-
-      // Percentuale barra di progresso
-      const progressPercent = Math.round(((index + 1) / total) * 100);
-      document.getElementById('readerProgressBar').style.width = `${progressPercent}%`;
-
-      const iframe = document.getElementById('readerIframe');
-      const textContainer = document.getElementById('readerTextContainer');
-
-      if (chapter.htmlPath) {
-        iframe.classList.remove('hidden');
-        textContainer.classList.add('hidden');
-        iframe.src = resolveBookPath(chapter.htmlPath);
-      } else {
-        iframe.classList.add('hidden');
-        textContainer.classList.remove('hidden');
-        document.getElementById('readerTextContent').innerHTML = `
-          <h2 class="font-gloria text-2xl sm:text-3xl font-bold mb-2">${chapter.title}</h2>
-          ${chapter.subtitle ? `<p class="italic text-stone-600 mb-6">${chapter.subtitle}</p>` : ''}
-          <div class="mt-4">${chapter.contentHtml || '<p>Contenuto non disponibile.</p>'}</div>
-        `;
-      }
-
-      lucide.createIcons();
-    }
-
-    function prevChapter() {
-      if (currentChapterIndex > 0) {
-        loadChapter(currentChapterIndex - 1);
-      }
-    }
-
-    function nextChapter() {
-      if (!currentReadingBook || !currentReadingBook.chapters) return;
-      if (currentChapterIndex < currentReadingBook.chapters.length - 1) {
-        loadChapter(currentChapterIndex + 1);
-      } else {
-        // Celebrazione completamento
-        if (typeof confetti === 'function') {
-          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-        }
-      }
-    }
-
-    function changeChapter(val) {
-      loadChapter(parseInt(val, 10));
-    }
-
-    function closeReader() {
-      document.getElementById('readerModal').classList.add('hidden');
-      document.getElementById('readerIframe').src = 'about:blank';
-      document.body.style.overflow = '';
-      currentReadingBook = null;
-    }
-
-    // Chiusura con tasto ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (!document.getElementById('readerModal').classList.contains('hidden')) {
-          closeReader();
-        }
-      }
-    });
-
-    // =========================================================================
-    // SEGNALIBRI (LOCAL STORAGE)
-    // =========================================================================
-    function toggleBookmark(bookId, e) {
-      if (e) e.stopPropagation();
-      if (bookmarks.includes(bookId)) {
-        bookmarks = bookmarks.filter(id => id !== bookId);
-      } else {
-        bookmarks.push(bookId);
-      }
-      localStorage.setItem('lib_bookmarks', JSON.stringify(bookmarks));
-      renderApp();
-      updateReaderBookmarkStatus();
-    }
-
-    function toggleCurrentBookmark() {
-      if (currentReadingBook) {
-        toggleBookmark(currentReadingBook.id);
-      }
-    }
-
-    function updateReaderBookmarkStatus() {
-      if (!currentReadingBook) return;
-      const isBookmarked = bookmarks.includes(currentReadingBook.id);
-      const icon = document.getElementById('readerBookmarkIcon');
-      if (isBookmarked) {
-        icon.classList.add('fill-amber-500', 'text-amber-500');
-      } else {
-        icon.classList.remove('fill-amber-500', 'text-amber-500');
-      }
-    }
-
-    // =========================================================================
-    // FILTRI, RICERCA E VISTA
-    // =========================================================================
-    function switchView(view) {
-      currentView = view;
-      const shelfBtn = document.getElementById('viewShelfBtn');
-      const gridBtn = document.getElementById('viewGridBtn');
-      const bookmBtn = document.getElementById('viewBookmarksBtn');
-
-      const activeClass = 'bg-amber-600 text-stone-950 font-semibold shadow';
-      const inactiveClass = 'text-stone-400 hover:text-amber-200';
-
-      shelfBtn.className = `px-3 py-1 text-xs font-medium rounded-lg transition flex items-center gap-1.5 ${view === 'shelf' ? activeClass : inactiveClass}`;
-      gridBtn.className = `px-3 py-1 text-xs font-medium rounded-lg transition flex items-center gap-1.5 ${view === 'grid' ? activeClass : inactiveClass}`;
-      bookmBtn.className = `px-3 py-1 text-xs font-medium rounded-lg transition flex items-center gap-1.5 ${view === 'bookmarks' ? activeClass : inactiveClass}`;
-
-      renderApp();
-    }
-
-    function filterGenre(genre) {
-      selectedGenre = genre;
-      renderGenreFilters();
-      renderApp();
-    }
-
-    function handleSearch() {
-      const val = document.getElementById('searchInput').value;
-      searchQuery = val;
+    function searchCards(query) {
       const clearBtn = document.getElementById('clearSearchBtn');
-      if (val.trim() !== '') {
+      if (query.trim().length > 0) {
         clearBtn.classList.remove('hidden');
       } else {
         clearBtn.classList.add('hidden');
       }
-      renderApp();
+      applyFilters();
     }
 
     function clearSearch() {
-      document.getElementById('searchInput').value = '';
-      searchQuery = '';
+      const input = document.getElementById('cardSearchInput');
+      if (input) input.value = '';
       document.getElementById('clearSearchBtn').classList.add('hidden');
-      renderApp();
+      applyFilters();
     }
 
-    function handleSort() {
-      sortMode = document.getElementById('sortSelect').value;
-      renderApp();
+    function applyFilters() {
+      const query = (document.getElementById('cardSearchInput')?.value || '').toLowerCase().trim();
+      const cards = document.querySelectorAll('.bento-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const cardCat = card.getAttribute('data-category') || '';
+        const cardTitle = (card.getAttribute('data-title') || '').toLowerCase();
+        const cardText = card.textContent.toLowerCase();
+
+        const matchCat = (currentCategory === 'all') || cardCat.includes(currentCategory);
+        const matchSearch = (query === '') || cardTitle.includes(query) || cardText.includes(query);
+
+        if (matchCat && matchSearch) {
+          card.classList.remove('card-hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('card-hidden');
+        }
+      });
+
+      const noResults = document.getElementById('noResultsState');
+      if (visibleCount === 0) {
+        noResults.classList.remove('hidden');
+      } else {
+        noResults.classList.add('hidden');
+      }
     }
 
-    function resetFilters() {
-      selectedGenre = 'ALL';
-      searchQuery = '';
-      document.getElementById('searchInput').value = '';
-      document.getElementById('clearSearchBtn').classList.add('hidden');
-      currentView = 'shelf';
-      switchView('shelf');
-      renderGenreFilters();
-      renderApp();
+    /* ==========================================================================
+       4. CALENDARIO DINAMICO (Mese, Anno, Ideogrammi, Giorni)
+       ========================================================================== */
+    let currentCalDate = new Date();
+
+    function renderCalendar() {
+      const year = currentCalDate.getFullYear();
+      const month = currentCalDate.getMonth();
+      
+      const monthNamesIt = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+      const monthNamesCn = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+      
+      const titleEl = document.getElementById("cal-month-title");
+      const cnEl = document.getElementById("cal-month-cn");
+      if (titleEl) titleEl.textContent = `${monthNamesIt[month]} ${year}`;
+      if (cnEl) cnEl.textContent = monthNamesCn[month];
+
+      const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7; // Lunedì = 0
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      
+      const grid = document.getElementById("cal-days-grid");
+      if (!grid) return;
+      grid.innerHTML = "";
+
+      // Caselle vuote prima del primo giorno
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement("span");
+        emptyCell.className = "py-0.5 text-transparent opacity-0 pointer-events-none";
+        emptyCell.textContent = "0";
+        grid.appendChild(emptyCell);
+      }
+
+      const today = new Date();
+
+      // Giorni del mese
+      for (let d = 1; d <= totalDays; d++) {
+        const dayCell = document.createElement("button");
+        dayCell.type = "button";
+        dayCell.textContent = d;
+        const isToday = (today.getDate() === d && today.getMonth() === month && today.getFullYear() === year);
+
+        if (isToday) {
+          dayCell.className = "py-0.5 rounded-full bg-red-500 text-white font-black shadow-xs hover:scale-110 transition-transform cursor-pointer border border-white/50";
+        } else {
+          dayCell.className = "py-0.5 rounded hover:bg-white/20 text-white/90 transition-colors cursor-pointer";
+        }
+
+        dayCell.onclick = function() {
+          const hint = document.getElementById('cal-selected-hint');
+          if (hint) {
+            hint.textContent = `${d} ${monthNamesIt[month]}: Studio Cinese ★`;
+          }
+        };
+
+        grid.appendChild(dayCell);
+      }
     }
+
+    function changeMonth(delta) {
+      currentCalDate.setMonth(currentCalDate.getMonth() + delta);
+      renderCalendar();
+    }
+
+    /* ==========================================================================
+       5. MODAL POPUP FUNZIONI
+       ========================================================================== */
+    function openModal() {
+      const modal = document.getElementById('modalIframe');
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+    function closeModal() {
+      const modal = document.getElementById('modalIframe');
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+    window.addEventListener('click', (e) => {
+      if (e.target.id === 'modalIframe') closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    /* ==========================================================================
+       6. CAMPANELLA NOTIFICHE AGGIORNAMENTI
+       ========================================================================== */
+    const bell = document.getElementById('bell-swing');
+    if (bell) {
+      bell.onclick = function() {
+        alert("🇨🇳 Benvenuto nell'Hub Interattivo Lingua Cinese!\n\n✨ Novità:\n• Nuova Flashcard 3D sfogliabile con pronuncia audio\n• Sfondo raffinato carta di riso meno abbagliante\n• Suddivisione in comode Categorie e Ricerca rapida\n• Frame ottimizzati per smartphone & desktop");
+      };
+    }
+
+    /* ==========================================================================
+       7. MICRO-INTERAZIONE LIKE AUDIO
+       ========================================================================== */
+    let audioLikes = 2400;
+    let hasLiked = false;
+    function likeAudio(btn) {
+      if (!hasLiked) {
+        audioLikes++;
+        hasLiked = true;
+        btn.classList.add('bg-rose-600', 'scale-110');
+      } else {
+        audioLikes--;
+        hasLiked = false;
+        btn.classList.remove('bg-rose-600', 'scale-110');
+      }
+      const el = document.getElementById('audioLikesCount');
+      if (el) el.textContent = `${(audioLikes/1000).toFixed(1)}k`;
+    }
+
+    // Inizializzazioni al caricamento
+    document.addEventListener('DOMContentLoaded', () => {
+      loadQuoteSticker();
+      renderFlashcard();
+      renderCalendar();
+    });
+/* ==========================================================================
+   CARICAMENTO NOTIZIE FLASH DA JSON (notizie-flash.json)
+   ========================================================================== */
+let flashNewsList = [
+  {
+    tag: "快报 / FLASH NEWS",
+    title: "Festival e Tradizioni Cinesi",
+    description: "Curiosità, quiz, approfondimenti culturali e articoli dal blog.",
+    date: "Oggi",
+    link: "blog.html"
+  }
+];
+let currentNewsIndex = 0;
+
+async function loadFlashNews() {
+  try {
+    const res = await fetch('./notizie-flash.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('File notizie-flash.json non trovato');
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      flashNewsList = data;
+    }
+  } catch (err) {
+    console.info('Utilizzo notizia flash predefinita:', err.message);
+  } finally {
+    renderFlashNews();
+  }
+}
+
+function renderFlashNews() {
+  if (!flashNewsList.length) return;
+  const item = flashNewsList[currentNewsIndex];
+
+  const tagEl = document.getElementById('newsTag');
+  const dateEl = document.getElementById('newsDate');
+  const titleEl = document.getElementById('newsTitle');
+  const descEl = document.getElementById('newsDesc');
+  const linkEl = document.getElementById('newsLink');
+  const counterEl = document.getElementById('newsCounter');
+
+  if (tagEl) tagEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span> ${item.tag || '快报 / NEWS'}`;
+  if (dateEl) dateEl.textContent = item.date || 'Oggi';
+  if (titleEl) titleEl.textContent = item.title;
+  if (descEl) descEl.textContent = item.description || '';
+  if (linkEl) linkEl.href = item.link || 'blog.html';
+  if (counterEl) counterEl.textContent = `${currentNewsIndex + 1}/${flashNewsList.length}`;
+}
+
+function nextNews(e) {
+  if (e) e.stopPropagation();
+  currentNewsIndex = (currentNewsIndex + 1) % flashNewsList.length;
+  renderFlashNews();
+}
+
+function prevNews(e) {
+  if (e) e.stopPropagation();
+  currentNewsIndex = (currentNewsIndex - 1 + flashNewsList.length) % flashNewsList.length;
+  renderFlashNews();
+}
+
+// Chiamata all'avvio:
+loadFlashNews();
+ /* ==========================================================================
+       1. SISTEMA QUIZ INTERATTIVO DINAMICO
+       ========================================================================== */
+    const quizQuestions = [
+      {
+        question: "Cosa significa '谢谢' (xièxie) in cinese?",
+        options: ["Ciao", "Grazie", "Prego", "Arrivederci"],
+        correctIndex: 1
+      },
+      {
+        question: "Quale frase si usa per chiedere il conto al ristorante?",
+        options: ["请少放点辣", "买单，谢谢", "请给我一杯水", "你好吗"],
+        correctIndex: 1
+      },
+      {
+        question: "Qual è il significato del carattere '水' (shuǐ)?",
+        options: ["Fuoco", "Legno", "Acqua", "Terra"],
+        correctIndex: 2
+      },
+      {
+        question: "Come si dice 'Io studio cinese'?",
+        options: ["我喝咖啡", "我想去中国", "我学习中文", "他是我的朋友"],
+        correctIndex: 2
+      }
+    ];
+
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let quizAnswered = false;
+
+    function renderQuizQuestion() {
+      const q = quizQuestions[currentQuizIndex];
+      const qText = document.getElementById('quiz-question-text');
+      const optContainer = document.getElementById('quiz-options-container');
+      const progText = document.getElementById('quiz-progress-text');
+      const scoreDisplay = document.getElementById('quiz-score-display');
+
+      if (!qText || !optContainer) return;
+
+      quizAnswered = false;
+      qText.textContent = `${currentQuizIndex + 1}. ${q.question}`;
+      progText.textContent = `Domanda ${currentQuizIndex + 1} di ${quizQuestions.length}`;
+      scoreDisplay.textContent = `Punti: ${quizScore}/${quizQuestions.length}`;
+
+      optContainer.innerHTML = '';
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'w-full text-left px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-900 text-xs font-bold rounded-lg border border-slate-900 neo-shadow-sm transition-transform active:scale-98 cursor-pointer flex items-center justify-between';
+        btn.innerHTML = `<span>${String.fromCharCode(65 + idx)}. ${opt}</span> <span class="opt-status text-[10px]"></span>`;
+        
+        btn.onclick = () => selectQuizOption(idx, btn);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function selectQuizOption(selectedIdx, btnElement) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+
+      const q = quizQuestions[currentQuizIndex];
+      const isCorrect = (selectedIdx === q.correctIndex);
+      const allButtons = document.querySelectorAll('#quiz-options-container button');
+
+      if (isCorrect) {
+        quizScore++;
+        btnElement.classList.remove('bg-white');
+        btnElement.classList.add('bg-emerald-300', 'text-slate-950');
+        btnElement.querySelector('.opt-status').textContent = '✓ Corretto!';
+      } else {
+        btnElement.classList.remove('bg-white');
+        btnElement.classList.add('bg-rose-300', 'text-slate-950');
+        btnElement.querySelector('.opt-status').textContent = '✗';
+        
+        // Evidenzia la corretta
+        const correctBtn = allButtons[q.correctIndex];
+        if (correctBtn) {
+          correctBtn.classList.remove('bg-white');
+          correctBtn.classList.add('bg-emerald-200');
+          correctBtn.querySelector('.opt-status').textContent = '✓';
+        }
+      }
+
+      const scoreDisplay = document.getElementById('quiz-score-display');
+      if (scoreDisplay) {
+        scoreDisplay.textContent = `Punti: ${quizScore}/${quizQuestions.length}`;
+      }
+    }
+
+    function nextQuizQuestion() {
+      currentQuizIndex = (currentQuizIndex + 1) % quizQuestions.length;
+      if (currentQuizIndex === 0 && quizAnswered) {
+        // Reset score al completamento del ciclo
+        quizScore = 0;
+      }
+      renderQuizQuestion();
+    }
+    });
   </script>
 </body>
 </html>
